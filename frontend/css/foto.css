@@ -1,0 +1,47 @@
+  /* Class pembungkus gambar */
+  .hover-zoom {
+    overflow: hidden; /* Sembunyikan bagian gambar yang melebihi kotak saat di-zoom */
+    border-radius: 5px; /* Opsional: Biar sudutnya melengkung ikutin style Bootstrap */
+  }
+
+  /* Target ke gambarnya */
+  .hover-zoom img {
+    transition: transform 0.3s ease; /* Animasi halus selama 0.3 detik */
+  }
+
+  /* Efek saat mouse diarahkan ke pembungkus */
+  .hover-zoom:hover img {
+    transform: scale(1.1); /* Perbesar gambar 1.1x lipat (110%) */
+  }
+
+
+
+  .youtube-wrapper {
+    position: relative;
+    width: 450px;      /* bisa kamu sesuaikan */
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform .25s ease;
+}
+
+.youtube-wrapper:hover {
+    transform: scale(1.03);
+}
+
+.yt-thumb {
+    width: 100%;
+    display: block;
+}
+
+.yt-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70px;
+    height: 50px;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/7/75/YouTube_social_white_squircle_%282017%29.svg');
+    background-size: cover;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
+    pointer-events: none;
+}

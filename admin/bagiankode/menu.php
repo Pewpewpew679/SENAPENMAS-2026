@@ -15,8 +15,8 @@
                             </a>
                             <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="manage_profile.php">Manage Profile</a>
-                                    <a class="nav-link" href="manage_events.php">Manage Events</a>
+                                    <a class="nav-link" href="inputprofile.php">Manage Profile</a>
+                                    <a class="nav-link" href="inputevents.php">Manage Events</a>
                                     <a class="nav-link" href="inputpenasihat.php">Manage Pages</a>
                                     <a class="nav-link" href="inputpesertaskripsi.php">Manage Schedule</a>
                                     <a class="nav-link" href="inputbimbinganskripsi.php">Manage Speakers</a>
@@ -24,9 +24,9 @@
                                     <a class="nav-link" href="inputruangsidang.php">Manage Supported</a>
                                     <a class="nav-link" href="inputberita.php">Manage Sponsor</a>
                                     <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Menu</a>
-                                    <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Slider</a>
+                                    <a class="nav-link" href="inputslider.php">Manage Slider</a>
                                     <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Sosmed</a>
-                                    <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Link</a>
+                                    <a class="nav-link" href="inputlink.php">Manage Link</a>
                                     <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Speaker</a>
                                     <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Luaran Publikasi</a>
                                     <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Panitia</a>

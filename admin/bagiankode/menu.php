@@ -17,7 +17,7 @@
                                 <nav class="sb-sidenav-menu-nested nav">
                                     <a class="nav-link" href="inputmhs.php">Mahasiswa</a>
                                     <a class="nav-link" href="inputdsn.php">Dosen</a>
-                                    <a class="nav-link" href="inputpenasihat.php">Penasihat</a>
+                                    <a class="nav-link" href="inputsdlider.php">Manage Slider</a>
                                     <a class="nav-link" href="inputpesertaskripsi.php">Peserta Skripsi</a>
                                     <a class="nav-link" href="inputbimbinganskripsi.php">Bimbingan Skripsi</a>
                                     <a class="nav-link" href="inputujianskripsi.php">Ujian Skripsi</a>
@@ -64,9 +64,17 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
                                 Charts
                             </a>
-                            <a class="nav-link" href="tables.html">
+                            <a class="nav-link" href="inputslider.php">
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Tables
+                                Manage Slider
+                            </a>
+                            <a class="nav-link" href="inputsosmed.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Sosial Media
+                            </a>
+                            <a class="nav-link" href="inputlinks.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Links
                             </a>
                         </div>
                     </div>

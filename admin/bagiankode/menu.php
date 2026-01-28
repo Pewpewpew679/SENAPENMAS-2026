@@ -27,6 +27,7 @@
                                     <a class="nav-link" href="inputslider.php">Manage Slider</a>
                                     <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Sosmed</a>
                                     <a class="nav-link" href="inputlink.php">Manage Link</a>
+                                    <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Speaker</a>
                                     <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Luaran Publikasi</a>
                                     <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Panitia</a>
 

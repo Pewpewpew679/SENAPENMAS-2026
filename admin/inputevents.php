@@ -13,10 +13,10 @@
     // A. LOGIC: SET HOMEPAGE (DUAL ACTION)
     // ==========================================
     if (isset($_POST['process_homepage'])) {
-        $id = (int) $_POST['id'];
+        $event_id = (int) $_POST['event_id'];
         $status_pilihan = $_POST['process_homepage']; 
 
-        $query = "UPDATE events SET homepage = '$status_pilihan' WHERE id = $id";
+        $query = "UPDATE events SET homepage = '$status_pilihan' WHERE event_id = $event_id";
         
         if (mysqli_query($conn, $query)) {
             header("Location: inputevents.php?msg=status_updated");
@@ -74,7 +74,7 @@
     // C. LOGIC: EDIT DATA (UPDATE EVENT)
     // ==========================================
     if (isset($_POST['Update'])) {
-        $id         = (int) $_POST['id'];
+        $event_id   = (int) $_POST['event_id'];
         $old_poster = $_POST['old_poster'];
         
         $category   = mysqli_real_escape_string($conn, $_POST['event_category']);
@@ -113,7 +113,7 @@
                   event_year='$year', description='$desc', start_date='$start', end_date='$end', 
                   poster='$final_poster', link_registration='$link_reg', linkpage_event='$linkpage',
                   is_menu='$is_menu', menu_parent='$menu_parent', menu_order='$menu_order', publish_date='$pub_date', status='$status'
-                  WHERE id='$id'";
+                  WHERE event_id='$event_id'";
 
         if(mysqli_query($conn, $query)){
             header("Location: inputevents.php?msg=updated");
@@ -163,7 +163,7 @@
                                         <tbody>
                                             <?php
                                             $no = 1;
-                                            $query = mysqli_query($conn, "SELECT * FROM events ORDER BY id DESC");
+                                            $query = mysqli_query($conn, "SELECT * FROM events ORDER BY event_id DESC");
                                             while ($row = mysqli_fetch_assoc($query)) {
                                                 $startDate = date("M j, Y", strtotime($row['start_date'])); 
                                                 $endDate   = date("M j, Y", strtotime($row['end_date']));
@@ -188,14 +188,14 @@
                                                 <td>
                                                     <a href="#" class="text-primary d-block mb-1 btn-set-homepage" 
                                                        style="text-decoration:none;"
-                                                       data-id="<?= $row['id'] ?>"
+                                                       data-id="<?= $row['event_id'] ?>"
                                                        data-name="<?= htmlspecialchars($row['event_name']) ?>">
                                                        Set Homepage
                                                     </a>
                                                     
                                                     <a href="#" class="text-primary me-2 btn-edit" style="text-decoration:none;"
                                                        data-bs-toggle="modal" data-bs-target="#editEventModal"
-                                                       data-id="<?= $row['id'] ?>"
+                                                       data-id="<?= $row['event_id'] ?>"
                                                        data-poster="<?= $row['poster'] ?>"
                                                        data-category="<?= $row['event_category'] ?>"
                                                        data-name="<?= htmlspecialchars($row['event_name']) ?>"
@@ -214,7 +214,7 @@
                                                        Edit
                                                     </a>
 
-                                                    <a href="hapusevents.php?id=<?= $row['id'] ?>&poster=<?= $row['poster'] ?>" 
+                                                    <a href="hapusevents.php?id=<?= $row['event_id'] ?>&poster=<?= $row['poster'] ?>" 
                                                        class="text-primary" style="text-decoration:none;"
                                                        onclick="return confirm('Yakin hapus data ini?')">Delete</a>
                                                 </td>
@@ -242,7 +242,7 @@
                         </div>
                         
                         <div class="modal-body">
-                            <input type="hidden" name="id" id="homepage-id">
+                            <input type="hidden" name="event_id" id="homepage-id">
                             <p>Are you sure to display event "<b id="homepage-event-name"></b>" on the homepage?</p>
                         </div>
                         
@@ -327,7 +327,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            <input type="hidden" name="id" id="edit-id">
+                            <input type="hidden" name="event_id" id="edit-id">
                             <input type="hidden" name="old_poster" id="edit-old-poster">
                             
                             <div class="row mb-3">

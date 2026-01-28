@@ -19,7 +19,7 @@
         $query = "UPDATE events SET homepage = '$status_pilihan' WHERE id = $id";
         
         if (mysqli_query($conn, $query)) {
-            header("Location: manage_events.php?msg=status_updated");
+            header("Location: inputevents.php?msg=status_updated");
         } else {
             echo "Error: " . mysqli_error($conn);
         }
@@ -62,7 +62,7 @@
                       ('$category', '$name', '$topic', '$year', '$desc', '$start', '$end', '$new_poster', '$link_reg', '$linkpage', '$is_menu', '$menu_parent', '$menu_order', '$pub_date', '$status', 'No')";
             
             if (mysqli_query($conn, $query)) {
-                header("Location: manage_events.php?msg=success");
+                header("Location: inputevents.php?msg=success");
             } else {
                 echo "Error: " . mysqli_error($conn);
             }
@@ -116,7 +116,7 @@
                   WHERE id='$id'";
 
         if(mysqli_query($conn, $query)){
-            header("Location: manage_events.php?msg=updated");
+            header("Location: inputevents.php?msg=updated");
         } else {
             echo "Error: " . mysqli_error($conn);
         }

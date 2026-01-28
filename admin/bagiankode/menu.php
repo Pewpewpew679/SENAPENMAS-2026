@@ -18,8 +18,8 @@
                                     <a class="nav-link" href="inputprofile.php">Manage Profile</a>
                                     <a class="nav-link" href="inputevents.php">Manage Events</a>
                                     <a class="nav-link" href="inputpenasihat.php">Manage Pages</a>
-                                    <a class="nav-link" href="inputpesertaskripsi.php">Manage Schedule</a>
-                                    <a class="nav-link" href="inputbimbinganskripsi.php">Manage Speakers</a>
+                                    <a class="nav-link" href="manage_schedule.php">Manage Schedule</a>
+                                    <a class="nav-link" href="manage_speaker.php">Manage Speakers</a>
                                     <a class="nav-link" href="inputujianskripsi.php">Manage Downloadable File</a>
                                     <a class="nav-link" href="inputruangsidang.php">Manage Supported</a>
                                     <a class="nav-link" href="inputberita.php">Manage Sponsor</a>

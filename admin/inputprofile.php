@@ -12,7 +12,7 @@ include "includes/config.php";
 if (isset($_POST['Update'])) {
     
     // Ambil data gambar lama
-    $qOld = mysqli_query($conn, "SELECT logo_web, logo_profile FROM profile ORDER BY id DESC LIMIT 1");
+    $qOld = mysqli_query($conn, "SELECT logo_web, logo_profile FROM profile ORDER BY profile_id DESC LIMIT 1");
     $oldData = mysqli_fetch_array($qOld);
     
     // Default gambar pake yang lama
@@ -54,7 +54,7 @@ if (isset($_POST['Update'])) {
               VALUES ('$webName', '$webUrl', '$finalLogoWeb', '$profileName', '$finalLogoProfile', '$secretariatOffice', '$phone1', '$phone2', '$email')";
     
     if(mysqli_query($conn, $query)){
-        header("Location: profile.php?success=1"); 
+        header("Location: inputprofile.php?success=1"); 
         exit();
     } else {
         echo "Error: " . mysqli_error($conn);
@@ -62,7 +62,7 @@ if (isset($_POST['Update'])) {
 }
 
 // AMBIL DATA TERAKHIR (SELECT)
-$queryLastData = mysqli_query($conn, "SELECT * FROM profile ORDER BY id DESC LIMIT 1");
+$queryLastData = mysqli_query($conn, "SELECT * FROM profile ORDER BY profile_id DESC LIMIT 1");
 $row = mysqli_fetch_array($queryLastData);
 
 // Jika database kosong
@@ -208,7 +208,7 @@ if (!$row) {
                                 <div class="row mt-4">
                                     <div class="col-sm-3"></div>
                                     <div class="col-sm-9">
-                                        <a href="profile.php" class="btn btn-secondary">Cancel</a>
+                                        <a href="inputprofile.php" class="btn btn-secondary">Cancel</a>
                                         <button type="submit" class="btn btn-primary" name="Update">Update</button>
                                     </div>
                                 </div>

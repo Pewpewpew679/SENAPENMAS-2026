@@ -1,0 +1,12 @@
+RewriteEngine On
+RewriteBase /senapenmas-2026/frontend/
+
+# Redirect page/ID/slug to page.php?id=ID
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^page/([0-9]+)/(.+)$ page.php?id=$1 [L,QSA]
+
+# Optional: Remove .php extension from all files
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteCond %{REQUEST_FILENAME}.php -f
+# RewriteRule ^(.*)$ $1.php [L]

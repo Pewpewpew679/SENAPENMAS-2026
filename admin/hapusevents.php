@@ -10,7 +10,7 @@ if (!isset($_SESSION['useremail'])) {
 include "includes/config.php";
 
 if (isset($_GET['id']) && isset($_GET['poster'])) {
-    $id = (int) $_GET['id'];
+    $event_id = (int) $_GET['id'];
     $poster = mysqli_real_escape_string($conn, $_GET['poster']);
 
     // Hapus file poster
@@ -20,11 +20,15 @@ if (isset($_GET['id']) && isset($_GET['poster'])) {
     }
 
     // Hapus data dari database
-    $query = "DELETE FROM events WHERE id = $id";
-    mysqli_query($conn, $query);
-
-    header("Location: inputevents.php?msg=deleted");
-    exit;
+    $query = "DELETE FROM events WHERE event_id = $event_id";
+    
+    if (mysqli_query($conn, $query)) {
+        header("Location: inputevents.php?msg=deleted");
+        exit;
+    } else {
+        echo "Error: " . mysqli_error($conn);
+        exit;
+    }
 } else {
     header("Location: inputevents.php");
     exit;

@@ -15,7 +15,6 @@
                             </a>
                             <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
-<<<<<<< HEAD
                                     <a class="nav-link" href="inputmhs.php">Mahasiswa</a>
                                     <a class="nav-link" href="inputdsn.php">Dosen</a>
                                     <a class="nav-link" href="inputsdlider.php">Manage Slider</a>
@@ -26,7 +25,6 @@
                                     <a class="nav-link" href="inputberita.php">Berita</a>
                                     <a class="nav-link" href="inputkomentarmahasiswa.php">Komentar Mahasiswa</a>
 
-=======
                                     <a class="nav-link" href="inputprofile.php">Manage Profile</a>
                                     <a class="nav-link" href="inputevents.php">Manage Events</a>
                                     <a class="nav-link" href="inputpenasihat.php">Manage Pages</a>
@@ -42,8 +40,6 @@
                                     <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Speaker</a>
                                     <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Luaran Publikasi</a>
                                     <a class="nav-link" href="inputkomentarmahasiswa.php">Manage Panitia</a>
->>>>>>> 194f167d3b7e16804d4431561a2804c520f7c345
-
                                 </nav>
                             </div>
                             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
@@ -93,6 +89,10 @@
                             <a class="nav-link" href="inputlinks.php">
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Manage Links
+                            </a>
+                             <a class="nav-link" href="inputsupported.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Supported
                             </a>
                         </div>
                     </div>

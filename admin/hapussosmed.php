@@ -9,18 +9,19 @@ if (!isset($_SESSION['useremail'])) {
 
 include "includes/config.php";
 
-if (!isset($_GET['akun'])) {
+if (isset($_GET['id'])) {
+    $social_id = mysqli_real_escape_string($conn, $_GET['id']);
+
+    $query = "DELETE FROM sosmed WHERE social_id = '$social_id'";
+    
+    if (mysqli_query($conn, $query)) {
+        header("Location: inputsosmed.php?status=success_delete");
+    } else {
+        header("Location: inputsosmed.php?status=error_delete");
+    }
+    exit;
+} else {
     header("Location: inputsosmed.php");
     exit;
 }
-
-$akun = mysqli_real_escape_string($conn, $_GET['akun']);
-
-mysqli_query($conn, "
-    DELETE FROM sosmed 
-    WHERE akun = '$akun'
-");
-
-header("Location: inputsosmed.php");
-exit;
 ?>

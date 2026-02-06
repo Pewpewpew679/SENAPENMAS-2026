@@ -17,7 +17,7 @@ if (isset($_GET['image'])) {
         unlink($file_path);
     }
 
-    $query = "DELETE FROM slider WHERE image_slider = '$image_name'";
+    $query = "DELETE FROM sliders WHERE slider_image = '$image_name'";
     mysqli_query($conn, $query);
 
     header("Location: inputslider.php");

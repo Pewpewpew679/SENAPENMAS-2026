@@ -2,6 +2,7 @@
 ob_start();
 session_start();
 
+// Cek Login
 if (!isset($_SESSION['useremail'])) {
     header("Location: login.php");
     exit;
@@ -10,6 +11,7 @@ if (!isset($_SESSION['useremail'])) {
 include "includes/config.php";
 
 /* ================= ICON MAP ================= */
+// Digunakan untuk menampilkan icon berdasarkan nama platform
 $iconMap = [
     "Twitter"   => "bi-twitter-x",
     "Instagram" => "bi-instagram",
@@ -24,11 +26,13 @@ $iconMap = [
 
 /* ================= SIMPAN ================= */
 if (isset($_POST['Simpan'])) {
-    $akun = mysqli_real_escape_string($conn, $_POST['akun']);
-    $link = mysqli_real_escape_string($conn, $_POST['link']);
-    $icon = isset($iconMap[$akun]) ? $iconMap[$akun] : "bi-globe";
+    // Sesuaikan dengan kolom database Anda
+    $platform_name = mysqli_real_escape_string($conn, $_POST['platform_name']);
+    $social_link   = mysqli_real_escape_string($conn, $_POST['social_link']);
+    $profile_id    = 1; // Default profile_id jika belum ada sistem multi-user
 
-    mysqli_query($conn, "INSERT INTO sosmed (akun, link, icon) VALUES ('$akun','$link','$icon')");
+    mysqli_query($conn, "INSERT INTO sosmed (profile_id, platform_name, social_link) 
+                        VALUES ('$profile_id', '$platform_name', '$social_link')");
 
     header("Location: inputsosmed.php");
     exit;
@@ -36,12 +40,13 @@ if (isset($_POST['Simpan'])) {
 
 /* ================= UPDATE ================= */
 if (isset($_POST['Update'])) {
-    $old = mysqli_real_escape_string($conn, $_POST['old_akun']);
-    $akun = mysqli_real_escape_string($conn, $_POST['akun']);
-    $link = mysqli_real_escape_string($conn, $_POST['link']);
-    $icon = isset($iconMap[$akun]) ? $iconMap[$akun] : "bi-globe";
+    $social_id     = mysqli_real_escape_string($conn, $_POST['social_id']);
+    $platform_name = mysqli_real_escape_string($conn, $_POST['platform_name']);
+    $social_link   = mysqli_real_escape_string($conn, $_POST['social_link']);
 
-    mysqli_query($conn, "UPDATE sosmed SET akun='$akun', link='$link', icon='$icon' WHERE akun='$old'");
+    // Update menggunakan social_id agar lebih akurat (Primary Key)
+    mysqli_query($conn, "UPDATE sosmed SET platform_name='$platform_name', social_link='$social_link' 
+                        WHERE social_id='$social_id'");
 
     header("Location: inputsosmed.php");
     exit;
@@ -69,7 +74,7 @@ if (isset($_POST['Update'])) {
                 <div class="card mb-4">
                     <div class="card-body">
                         <button class="btn btn-success btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#addModal">
-                            <i class="bi bi-plus-lg"></i> Add Sosmed
+                            <i class="bi bi-plus-lg"></i> Add Social Media
                         </button>
 
                         <div class="table-responsive">
@@ -77,7 +82,7 @@ if (isset($_POST['Update'])) {
                                 <thead class="table-light">
                                     <tr>
                                         <th width="40">No</th>
-                                        <th>Akun</th>
+                                        <th>Platform</th>
                                         <th>Link</th>
                                         <th width="80" class="text-center">Icon</th>
                                         <th width="120">Action</th>
@@ -86,32 +91,33 @@ if (isset($_POST['Update'])) {
                                 <tbody>
                                     <?php
                                     $no = 1;
-                                    $q = mysqli_query($conn, "SELECT * FROM sosmed");
+                                    // Query sesuai nama tabel Anda
+                                    $q = mysqli_query($conn, "SELECT * FROM sosmed ORDER BY created_at DESC");
                                     while ($row = mysqli_fetch_assoc($q)) {
-                                        $displayIcon = !empty($row['icon']) ? $row['icon'] : ($iconMap[$row['akun']] ?? 'bi-globe');
+                                        // Cari icon di iconMap, jika tidak ada pakai globe
+                                        $displayIcon = $iconMap[$row['platform_name']] ?? 'bi-globe';
                                     ?>
                                     <tr>
                                         <td><?= $no++ ?></td>
-                                        <td><strong><?= htmlspecialchars($row['akun']) ?></strong></td>
-                                        <td><?= htmlspecialchars($row['link']) ?></td>
-                                        <td class="text-center" style="vertical-align: middle;">
-                                            <i class="bi <?= $displayIcon ?>" style="font-size:1.2rem; display: block;"></i>
+                                        <td><strong><?= htmlspecialchars($row['platform_name']) ?></strong></td>
+                                        <td><a href="<?= htmlspecialchars($row['social_link']) ?>" target="_blank"><?= htmlspecialchars($row['social_link']) ?></a></td>
+                                        <td class="text-center">
+                                            <i class="bi <?= $displayIcon ?>" style="font-size:1.2rem;"></i>
                                         </td>
                                         <td>
                                             <a href="javascript:void(0)" 
-                                               class="btn-edit" 
-                                               style="text-decoration: none; margin-right: 15px;"
+                                               class="btn-edit btn btn-warning btn-sm"
                                                data-bs-toggle="modal" 
                                                data-bs-target="#editModal"
-                                               data-old="<?= $row['akun'] ?>"
-                                               data-akun="<?= $row['akun'] ?>"
-                                               data-link="<?= $row['link'] ?>">
-                                                Edit
+                                               data-id="<?= $row['social_id'] ?>"
+                                               data-platform="<?= $row['platform_name'] ?>"
+                                               data-link="<?= $row['social_link'] ?>">
+                                               Edit
                                             </a>
-                                            <a href="hapussosmed.php?akun=<?= urlencode($row['akun']) ?>" 
-                                               style="text-decoration: none; color: #0d6efd;"
+                                            <a href="hapussosmed.php?id=<?= $row['social_id'] ?>" 
+                                               class="btn btn-danger btn-sm"
                                                onclick="return confirm('Hapus data ini?')">
-                                                Delete
+                                               Delete
                                             </a>
                                         </td>
                                     </tr>
@@ -137,9 +143,9 @@ if (isset($_POST['Update'])) {
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Jenis Akun *</label>
-                        <select name="akun" class="form-select" required>
-                            <option value="">-- Pilih Sosmed --</option>
+                        <label class="form-label">Platform *</label>
+                        <select name="platform_name" class="form-select" required>
+                            <option value="">-- Select Platform --</option>
                             <?php foreach ($iconMap as $k => $v): ?>
                                 <option value="<?= $k ?>"><?= $k ?></option>
                             <?php endforeach; ?>
@@ -147,7 +153,7 @@ if (isset($_POST['Update'])) {
                     </div>
                     <div class="mb-3">
                         <label class="form-label">URL / Link *</label>
-                        <input type="url" name="link" class="form-control" placeholder="Link" required>
+                        <input type="url" name="social_link" class="form-control" placeholder="https://..." required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -163,15 +169,15 @@ if (isset($_POST['Update'])) {
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="POST">
-                <input type="hidden" name="old_akun" id="edit-old">
+                <input type="hidden" name="social_id" id="edit-id">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Social Media</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Jenis Akun</label>
-                        <select name="akun" id="edit-akun" class="form-select">
+                        <label class="form-label">Platform</label>
+                        <select name="platform_name" id="edit-platform" class="form-select">
                             <?php foreach ($iconMap as $k => $v): ?>
                                 <option value="<?= $k ?>"><?= $k ?></option>
                             <?php endforeach; ?>
@@ -179,7 +185,7 @@ if (isset($_POST['Update'])) {
                     </div>
                     <div class="mb-3">
                         <label class="form-label">URL / Link</label>
-                        <input type="url" name="link" id="edit-link" class="form-control" required>
+                        <input type="url" name="social_link" id="edit-link" class="form-control" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -202,8 +208,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const editButtons = document.querySelectorAll('.btn-edit');
     editButtons.forEach(button => {
         button.addEventListener('click', function () {
-            document.getElementById('edit-old').value = this.getAttribute('data-old');
-            document.getElementById('edit-akun').value = this.getAttribute('data-akun');
+            document.getElementById('edit-id').value = this.getAttribute('data-id');
+            document.getElementById('edit-platform').value = this.getAttribute('data-platform');
             document.getElementById('edit-link').value = this.getAttribute('data-link');
         });
     });

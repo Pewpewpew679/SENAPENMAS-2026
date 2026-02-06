@@ -16,8 +16,7 @@ include "includes/config.php";
 if (isset($_POST['Simpan'])) {
     $title  = mysqli_real_escape_string($conn, $_POST['title']);
     $link   = mysqli_real_escape_string($conn, $_POST['link']);
-    $status = $_POST['status']; // Mengambil nilai 'Active' atau 'Inactive'
-    $order  = (int)$_POST['order_number'];
+    $status = (int) $_POST['status'];
 
     $image_name = $_FILES['image_slider']['name'];
     $tmp        = $_FILES['image_slider']['tmp_name'];
@@ -27,9 +26,7 @@ if (isset($_POST['Simpan'])) {
     $folder   = "images/";
 
     if (move_uploaded_file($tmp, $folder . $new_name)) {
-        // Nama kolom disesuaikan: slider_title, slider_image, slider_link, order_number, status
-        mysqli_query($conn, "INSERT INTO sliders (slider_title, slider_image, slider_link, order_number, status) 
-                            VALUES ('$title', '$new_name', '$link', '$order', '$status')");
+        mysqli_query($conn, "INSERT INTO slider (image_slider, title, link, status) VALUES ('$new_name', '$title', '$link', '$status')");
     }
 
     header("Location: inputslider.php");
@@ -43,8 +40,7 @@ if (isset($_POST['Update'])) {
     $old_image = mysqli_real_escape_string($conn, $_POST['old_image']);
     $title     = mysqli_real_escape_string($conn, $_POST['title']);
     $link      = mysqli_real_escape_string($conn, $_POST['link']);
-    $status    = $_POST['status'];
-    $order     = (int)$_POST['order_number'];
+    $status    = (int) $_POST['status'];
 
     if ($_FILES['image_slider']['name'] != "") {
         // Jika upload gambar baru
@@ -55,14 +51,15 @@ if (isset($_POST['Update'])) {
         
         move_uploaded_file($tmp, "images/" . $new_name);
         
+        // Hapus file fisik lama
         if (file_exists("images/" . $old_image)) {
             unlink("images/" . $old_image);
         }
 
-        mysqli_query($conn, "UPDATE sliders SET slider_image='$new_name', slider_title='$title', slider_link='$link', order_number='$order', status='$status' WHERE slider_image='$old_image'");
+        mysqli_query($conn, "UPDATE slider SET image_slider='$new_name', title='$title', link='$link', status='$status' WHERE image_slider='$old_image'");
     } else {
         // Jika tidak ganti gambar
-        mysqli_query($conn, "UPDATE sliders SET slider_title='$title', slider_link='$link', order_number='$order', status='$status' WHERE slider_image='$old_image'");
+        mysqli_query($conn, "UPDATE slider SET title='$title', link='$link', status='$status' WHERE image_slider='$old_image'");
     }
     header("Location: inputslider.php");
     exit;
@@ -98,7 +95,6 @@ if (isset($_POST['Update'])) {
                                         <th width="100">Image Slider</th>
                                         <th>Title</th>
                                         <th>Link</th>
-                                        <th width="40">Order</th>
                                         <th width="60">Status</th>
                                         <th width="120">Action</th>
                                     </tr>
@@ -106,34 +102,30 @@ if (isset($_POST['Update'])) {
                                 <tbody>
                                     <?php
                                     $no = 1;
-                                    $query = mysqli_query($conn, "SELECT * FROM sliders ORDER BY order_number ASC");
+                                    $query = mysqli_query($conn, "SELECT * FROM slider ORDER BY image_slider DESC");
                                     while ($row = mysqli_fetch_assoc($query)) {
                                     ?>
                                     <tr>
                                         <td><?= $no++ ?></td>
-                                        <td><img src="images/<?= $row['slider_image'] ?>" width="90" class="img-thumbnail"></td>
-                                        <td><?= htmlspecialchars($row['slider_title']) ?></td>
-                                        <td><?= htmlspecialchars($row['slider_link']) ?></td>
-                                        <td><?= $row['order_number'] ?></td>
+                                        <td><img src="images/<?= $row['image_slider'] ?>" width="90" class="img-thumbnail"></td>
+                                        <td><?= htmlspecialchars($row['title']) ?></td>
+                                        <td><?= htmlspecialchars($row['link']) ?></td>
                                         <td>
-                                            <span class="badge <?= $row['status'] == 'Active' ? 'bg-success' : 'bg-danger' ?>">
-                                                <?= $row['status'] ?>
-                                            </span>
+                                            <?= $row['status'] == 1 ? '<span>Aktif</span>' : '<span>Non Aktif</span>' ?>
                                         </td>
                                         <td>
                                             <a href="javascript:void(0)" 
-                                               class="btn-edit btn btn-warning btn-sm"
-                                               data-bs-toggle="modal" 
-                                               data-bs-target="#editSliderModal"
-                                               data-image="<?= $row['slider_image'] ?>"
-                                               data-title="<?= htmlspecialchars($row['slider_title']) ?>"
-                                               data-link="<?= htmlspecialchars($row['slider_link']) ?>"
-                                               data-order="<?= $row['order_number'] ?>"
-                                               data-status="<?= $row['status'] ?>">
+                                                    class="btn-edit me-2"href="#" 
+                                                    style="text-decoration: none; margin-right: 30px;"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#editSliderModal"
+                                                    data-image="<?= $row['image_slider'] ?>"
+                                                    data-title="<?= htmlspecialchars($row['title']) ?>"
+                                                    data-link="<?= htmlspecialchars($row['link']) ?>"
+                                                    data-status="<?= $row['status'] ?>">
                                                 Edit
                                             </a>
-                                            <a href="hapusslider.php?image=<?= $row['slider_image'] ?>" 
-                                               class="btn btn-danger btn-sm"
+                                            <a href="hapusslider.php?image=<?= $row['image_slider'] ?>" style="text-decoration: none;"
                                                onclick="return confirm('Hapus data ini?')">Delete</a>
                                         </td>
                                     </tr>
@@ -149,8 +141,9 @@ if (isset($_POST['Update'])) {
     </div>
 </div>
 
+
 <div class="modal fade" id="addSliderModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-md">
         <div class="modal-content">
             <form method="POST" enctype="multipart/form-data">
                 <div class="modal-header">
@@ -167,18 +160,14 @@ if (isset($_POST['Update'])) {
                         <input type="text" name="link" class="form-control">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Order Number</label>
-                        <input type="number" name="order_number" class="form-control" value="0">
-                    </div>
-                    <div class="mb-3">
                         <label class="form-label">Image *</label>
                         <input type="file" name="image_slider" class="form-control" accept=".jpg,.jpeg,.png" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Status *</label>
                         <select name="status" class="form-select">
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
+                            <option value="1">Aktif</option>
+                            <option value="0">Nonaktif</option>
                         </select>
                     </div>
                 </div>
@@ -191,8 +180,9 @@ if (isset($_POST['Update'])) {
     </div>
 </div>
 
+
 <div class="modal fade" id="editSliderModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-md">
         <div class="modal-content">
             <form method="POST" enctype="multipart/form-data">
                 <div class="modal-header">
@@ -210,19 +200,16 @@ if (isset($_POST['Update'])) {
                         <input type="text" name="link" id="edit-link" class="form-control">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Order Number</label>
-                        <input type="number" name="order_number" id="edit-order" class="form-control">
-                    </div>
-                    <div class="mb-3">
                         <label class="form-label d-block">Current Image</label>
                         <img src="" id="edit-preview" width="120" class="img-thumbnail mb-2">
                         <input type="file" name="image_slider" class="form-control" accept=".jpg,.jpeg,.png">
+                        <small class="text-muted">Biarkan kosong jika tidak ingin mengganti gambar.</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Status *</label>
                         <select name="status" id="edit-status" class="form-select">
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
+                            <option value="1">Aktif</option>
+                            <option value="0">Nonaktif</option>
                         </select>
                     </div>
                 </div>
@@ -239,19 +226,25 @@ if (isset($_POST['Update'])) {
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+    // Inisialisasi DataTable
     if (document.getElementById("sliderTable")) {
         new simpleDatatables.DataTable("#sliderTable");
     }
 
+    // Fungsi klik tombol Edit
     const editButtons = document.querySelectorAll('.btn-edit');
     editButtons.forEach(button => {
         button.addEventListener('click', function () {
-            document.getElementById('edit-old-image').value = this.getAttribute('data-image');
-            document.getElementById('edit-title').value = this.getAttribute('data-title');
-            document.getElementById('edit-link').value = this.getAttribute('data-link');
-            document.getElementById('edit-order').value = this.getAttribute('data-order');
-            document.getElementById('edit-status').value = this.getAttribute('data-status');
-            document.getElementById('edit-preview').src = 'images/' + this.getAttribute('data-image');
+            const image  = this.getAttribute('data-image');
+            const title  = this.getAttribute('data-title');
+            const link   = this.getAttribute('data-link');
+            const status = this.getAttribute('data-status');
+
+            document.getElementById('edit-old-image').value = image;
+            document.getElementById('edit-title').value = title;
+            document.getElementById('edit-link').value = link;
+            document.getElementById('edit-status').value = status;
+            document.getElementById('edit-preview').src = 'images/' + image;
         });
     });
 });

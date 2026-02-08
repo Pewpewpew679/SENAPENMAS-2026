@@ -13,7 +13,7 @@ $main_menus = mysqli_query($conn, $menu_query);
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="<?php echo $base_url; ?>main.php">
-      <img src="<?php echo $base_url; ?>images/UNTAR.png" alt="Logo UNTAR" width="60" height="40">
+      <img src="<?php echo $base_url; ?>images/UNTAR.png" alt="Logo UNTAR" width="140" height="40">
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -76,10 +76,6 @@ $main_menus = mysqli_query($conn, $menu_query);
           <?php endif; ?>
         <?php endwhile; ?>
       </ul>
-      <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
     </div>
   </div>
 </nav>

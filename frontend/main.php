@@ -8,7 +8,7 @@ include "includes/config.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TICASH 2025 - Universitas Tarumanagara</title>
+    <title>SENAPENMAS 2026</title>
 
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/foto.css">
@@ -24,6 +24,10 @@ include "includes/config.php";
         .carousel-item img {
             height: 600px;
             object-fit: cover;
+        }
+        .event-description {
+            line-height: 1.8;
+            text-align: justify;
         }
     </style>
 </head>
@@ -99,152 +103,85 @@ include "includes/config.php";
         ?>
         
         <?php if($homepage_event): ?>
-        <!-- Featured Event (Homepage Event) -->
         <section class="mb-5">
-            <div class="row">
-                <div class="col-lg-6 mb-4">
-                    <img src="images/events/<?= $homepage_event['poster'] ?>" class="img-fluid rounded shadow" alt="<?= htmlspecialchars($homepage_event['event_name']) ?>">
-                </div>
-                <div class="col-lg-6">
-                    <div class="badge bg-danger mb-2"><?= $homepage_event['event_category'] ?> <?= $homepage_event['event_year'] ?></div>
-                    <h2 class="fw-bold text-danger"><?= htmlspecialchars($homepage_event['event_name']) ?></h2>
-                    <h4 class="text-muted mb-3"><?= htmlspecialchars($homepage_event['event_topic']) ?></h4>
-                    
-                    <div class="mb-3">
-                        <strong><i class="bi bi-calendar-event"></i> Event Date:</strong><br>
-                        <?= date('F d, Y', strtotime($homepage_event['start_date'])) ?> - <?= date('F d, Y', strtotime($homepage_event['end_date'])) ?>
+            <div class="row gx-5">
+                
+                <div class="col-lg-8 mb-4">
+                    <div class="mb-4">
+                        <div style="border-top: 4px solid #FFC107; width: 80px; margin-bottom: 10px;"></div>
+                        <h2 class="fw-bold text-danger"><?= htmlspecialchars($homepage_event['event_name']) ?></h2>
                     </div>
                     
                     <div class="mb-4">
-                        <?= $homepage_event['description'] ?>
+                        <h3 class="fw-bold text-dark">Topic</h3>
+                        <p class="text-muted fs-5"><?= htmlspecialchars($homepage_event['event_topic']) ?></p>
                     </div>
                     
-                    <div class="d-flex gap-2">
-                        <?php if(!empty($homepage_event['link_registration'])): ?>
-                            <a href="<?= htmlspecialchars($homepage_event['link_registration']) ?>" class="btn btn-danger" target="_blank">
-                                <i class="bi bi-box-arrow-up-right"></i> Register Now
-                            </a>
-                        <?php endif; ?>
+                    <div class="mb-4">
+                        <div class="event-description">
+                            <?= $homepage_event['description'] ?>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="mb-4">
+                        <div style="border-top: 4px solid #FFC107; width: 80px; margin-bottom: 10px;"></div>
+                        <h3 class="fw-bold text-dark mb-3" style="color: #495057;">POSTER</h3>
                         
-                        <?php if(!empty($homepage_event['linkpage_event'])): ?>
-                            <a href="<?= htmlspecialchars($homepage_event['linkpage_event']) ?>" class="btn btn-outline-danger">
-                                <i class="bi bi-info-circle"></i> More Info
+                        <div class="mb-3 text-start">
+                            <img src="../admin/images/events/<?= $homepage_event['poster'] ?>" 
+                                 class="img-fluid rounded shadow" 
+                                 alt="<?= htmlspecialchars($homepage_event['event_name']) ?>"
+                                 style="width: 100%; height: auto; object-fit: contain; max-height: 500px;"
+                                 onerror="this.onerror=null; this.src='../admin/images/no-image.jpg';">
+                        </div>
+                        
+                        <div class="text-start">
+                            <a href="../admin/images/events/<?= $homepage_event['poster'] ?>" 
+                               download="<?= htmlspecialchars($homepage_event['event_name']) ?>_Poster.<?= pathinfo($homepage_event['poster'], PATHINFO_EXTENSION) ?>"
+                               class="btn btn-secondary w-100 py-2"
+                               style="background-color: #6c757d; border: none; border-radius: 5px; font-weight: 500;">
+                                Download Poster
                             </a>
-                        <?php endif; ?>
+                        </div>
+                    </div>
+                    
+                    <div style="border-top: 4px solid #FFC107; width: 80px; margin-bottom: 10px;"></div>
+                        <h3 class="fw-bold text-dark mb-3" style="color: #495057;">SCHEDULE</h3>
+
+                    <?php if(!empty($homepage_event['link_registration'])): ?>
+                    <div class="mb-4">
+                        <a href="<?= htmlspecialchars($homepage_event['link_registration']) ?>" 
+                           class="btn btn-danger w-100 py-2" 
+                           target="_blank">
+                            <i class="bi bi-box-arrow-up-right"></i> Register Now
+                        </a>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <?php if(!empty($homepage_event['linkpage_event'])): ?>
+                    <div class="mb-4">
+                        <a href="<?= htmlspecialchars($homepage_event['linkpage_event']) ?>" 
+                           class="btn btn-outline-danger w-100">
+                            <i class="bi bi-info-circle"></i> More Information
+                        </a>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <div class="mb-4 p-3 border rounded bg-light" style="min-height: 100px;">
+                        <h6 class="fw-bold mb-2 text-muted"><i class="bi bi-clock"></i> Schedule</h6>
+                        <p class="text-muted small mb-0">Schedule will be available soon</p>
+                    </div>
+                    
+                    <div class="mb-4 p-3 border rounded bg-light" style="min-height: 100px;">
+                        <h6 class="fw-bold mb-2 text-muted"><i class="bi bi-file-earmark-arrow-down"></i> Downloadable Files</h6>
+                        <p class="text-muted small mb-0">Files will be available soon</p>
                     </div>
                 </div>
             </div>
         </section>
-        <hr class="my-5">
         <?php endif; ?>
-
-        <!-- Upcoming Events Section -->
-        <section class="mb-5">
-            <h2 class="text-center fw-bold mb-4">Upcoming Events</h2>
-            <div class="row g-4">
-                <?php
-                // Ambil event yang aktif dan upcoming (belum lewat tanggal end_date), exclude yang sudah jadi homepage
-                $today = date('Y-m-d');
-                $events_query = "SELECT * FROM events 
-                                WHERE status = 1 
-                                AND end_date >= '$today'";
-                
-                if($homepage_event) {
-                    $events_query .= " AND event_id != " . $homepage_event['event_id'];
-                }
-                
-                $events_query .= " ORDER BY start_date ASC LIMIT 6";
-                
-                $events = mysqli_query($conn, $events_query);
-                
-                while($event = mysqli_fetch_assoc($events)):
-                ?>
-                <div class="col-lg-4 col-md-6">
-                    <div class="card event-card h-100">
-                        <img src="images/events/<?= $event['poster'] ?>" class="card-img-top" alt="<?= htmlspecialchars($event['event_name']) ?>" style="height: 250px; object-fit: cover;">
-                        <div class="card-body">
-                            <div class="badge bg-primary mb-2"><?= $event['event_category'] ?> <?= $event['event_year'] ?></div>
-                            <h5 class="card-title"><?= htmlspecialchars($event['event_name']) ?></h5>
-                            <p class="card-text text-muted"><?= htmlspecialchars($event['event_topic']) ?></p>
-                            <p class="text-danger"><small><strong>
-                                <i class="bi bi-calendar"></i> <?= date('M d, Y', strtotime($event['start_date'])) ?>
-                            </strong></small></p>
-                        </div>
-                        <div class="card-footer bg-white border-0">
-                            <div class="d-flex gap-2">
-                                <?php if(!empty($event['linkpage_event'])): ?>
-                                    <a href="<?= htmlspecialchars($event['linkpage_event']) ?>" class="btn btn-sm btn-outline-danger flex-fill">
-                                        More Info
-                                    </a>
-                                <?php endif; ?>
-                                
-                                <?php if(!empty($event['link_registration'])): ?>
-                                    <a href="<?= htmlspecialchars($event['link_registration']) ?>" class="btn btn-sm btn-danger flex-fill" target="_blank">
-                                        Register
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <?php endwhile; ?>
-            </div>
-        </section>
-
-        <!-- Past Events Section -->
-        <section class="mb-5">
-            <h2 class="text-center fw-bold mb-4">Past Events</h2>
-            <div class="row g-4">
-                <?php
-                // Ambil event yang sudah lewat (past events)
-                $past_events = mysqli_query($conn, "SELECT * FROM events 
-                                                    WHERE status = 1 
-                                                    AND end_date < '$today' 
-                                                    ORDER BY end_date DESC 
-                                                    LIMIT 3");
-                
-                while($past_event = mysqli_fetch_assoc($past_events)):
-                ?>
-                <div class="col-lg-4 col-md-6">
-                    <div class="card event-card h-100">
-                        <img src="images/events/<?= $past_event['poster'] ?>" class="card-img-top" alt="<?= htmlspecialchars($past_event['event_name']) ?>" style="height: 200px; object-fit: cover; filter: grayscale(30%);">
-                        <div class="card-body">
-                            <div class="badge bg-secondary mb-2"><?= $past_event['event_category'] ?> <?= $past_event['event_year'] ?></div>
-                            <h6 class="card-title"><?= htmlspecialchars($past_event['event_name']) ?></h6>
-                            <p class="card-text text-muted small"><?= htmlspecialchars($past_event['event_topic']) ?></p>
-                            <p class="text-secondary"><small>
-                                <i class="bi bi-calendar-check"></i> <?= date('M d, Y', strtotime($past_event['end_date'])) ?>
-                            </small></p>
-                        </div>
-                        <?php if(!empty($past_event['linkpage_event'])): ?>
-                        <div class="card-footer bg-white border-0">
-                            <a href="<?= htmlspecialchars($past_event['linkpage_event']) ?>" class="btn btn-sm btn-outline-secondary w-100">
-                                View Details
-                            </a>
-                        </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                <?php endwhile; ?>
-            </div>
-        </section>
-
-        <!-- About Section (Optional) -->
-        <section class="mb-5 py-5 bg-light rounded">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-6 mb-4">
-                        <h2 class="fw-bold text-danger">About TICASH</h2>
-                        <p class="lead">The International Conference on Applied Social Sciences and Humanities</p>
-                        <p>TICASH is an annual international conference organized by Universitas Tarumanagara, bringing together researchers, academics, and practitioners from around the world to share knowledge and innovations in social sciences and humanities.</p>
-                        <a href="page/1/about-us" class="btn btn-danger">Learn More</a>
-                    </div>
-                    <div class="col-lg-6">
-                        <img src="images/UNTAR.png" class="img-fluid" alt="UNTAR Logo">
-                    </div>
-                </div>
-            </div>
-        </section>
 
     </div>
     <!-- End Main Content -->

@@ -12,6 +12,7 @@ include "includes/config.php";
 
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/foto.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <style>
         .event-card {
@@ -22,21 +23,42 @@ include "includes/config.php";
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         .carousel-item img {
-            height: 600px;
+            height: 650px;
             object-fit: cover;
         }
         .event-description {
             line-height: 1.8;
             text-align: justify;
         }
+        .schedule-item:last-child {
+            border-bottom: none !important;
+            padding-bottom: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        .download-file-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .download-file-item:last-child {
+            border-bottom: none;
+        }
+        .download-file-item a {
+            color: #495057;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .download-file-item a:hover {
+            color: #7a1a00;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Menu Navigation -->
     <?php include("includes/frontmenu.php"); ?>
 
-    <!-- Slider Section -->
     <?php
     // Ambil slider yang aktif dari database, urutkan berdasarkan order_number
     $slider_query = mysqli_query($conn, "SELECT * FROM sliders WHERE status = 'Active' ORDER BY order_number ASC");
@@ -82,7 +104,6 @@ include "includes/config.php";
         </button>
     </div>
     <?php else: ?>
-        <!-- Default slider jika belum ada data di database -->
         <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <div class="carousel-item active">
@@ -91,22 +112,35 @@ include "includes/config.php";
             </div>
         </div>
     <?php endif; ?>
-    <!-- End Slider Section -->
-
-    <!-- Main Content -->
     <div class="container mt-5">
         
         <?php
         // Cek apakah ada event yang di-set sebagai homepage
         $homepage_event_query = mysqli_query($conn, "SELECT * FROM events WHERE homepage = 'Yes' AND status = 1 ORDER BY event_id DESC LIMIT 1");
         $homepage_event = mysqli_fetch_assoc($homepage_event_query);
+        
+        // Ambil schedule untuk event homepage jika ada
+        $schedules = [];
+        $downloadable_files = [];
+        if ($homepage_event) {
+            $schedule_query = mysqli_query($conn, "SELECT * FROM schedules WHERE event_id = " . $homepage_event['event_id'] . " ORDER BY date_new ASC");
+            while($schedule_row = mysqli_fetch_assoc($schedule_query)) {
+                $schedules[] = $schedule_row;
+            }
+            
+            // Ambil downloadable files untuk event homepage yang statusnya Publish
+            $files_query = mysqli_query($conn, "SELECT * FROM downloadablefiles WHERE event_id = " . $homepage_event['event_id'] . " AND status = 'Publish' ORDER BY file_id DESC");
+            while($file_row = mysqli_fetch_assoc($files_query)) {
+                $downloadable_files[] = $file_row;
+            }
+        }
         ?>
         
         <?php if($homepage_event): ?>
         <section class="mb-5">
-            <div class="row gx-5">
-                
-                <div class="col-lg-8 mb-4">
+            <div class="row">
+    
+                <div class="col-lg-7 mb-4">
                     <div class="mb-4">
                         <div style="border-top: 4px solid #FFC107; width: 80px; margin-bottom: 10px;"></div>
                         <h2 class="fw-bold text-danger"><?= htmlspecialchars($homepage_event['event_name']) ?></h2>
@@ -124,59 +158,93 @@ include "includes/config.php";
                     </div>
                 </div>
                 
-                <div class="col-lg-4">
+                <div class="col-lg-4 offset-lg-1">
                     <div class="mb-4">
                         <div style="border-top: 4px solid #FFC107; width: 80px; margin-bottom: 10px;"></div>
                         <h3 class="fw-bold text-dark mb-3" style="color: #495057;">POSTER</h3>
-                        
-                        <div class="mb-3 text-start">
+                        <div class="mb-3">
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#posterModal" style="display: block; cursor: pointer;">
                             <img src="../admin/images/events/<?= $homepage_event['poster'] ?>" 
-                                 class="img-fluid rounded shadow" 
-                                 alt="<?= htmlspecialchars($homepage_event['event_name']) ?>"
-                                 style="width: 100%; height: auto; object-fit: contain; max-height: 500px;"
-                                 onerror="this.onerror=null; this.src='../admin/images/no-image.jpg';">
+                                class="img-fluid rounded shadow" 
+                                alt="<?= htmlspecialchars($homepage_event['event_name']) ?>"
+                                style="width: 100%; height: auto; object-fit: cover; display: block;"
+                                onerror="this.onerror=null; this.src='../admin/images/no-image.jpg';">
+                            </a>
+                            <p class="text-muted small mt-2">*Klik gambar untuk memperbesar</p>
                         </div>
                         
-                        <div class="text-start">
+                        <div class="text-center">
                             <a href="../admin/images/events/<?= $homepage_event['poster'] ?>" 
-                               download="<?= htmlspecialchars($homepage_event['event_name']) ?>_Poster.<?= pathinfo($homepage_event['poster'], PATHINFO_EXTENSION) ?>"
-                               class="btn btn-secondary w-100 py-2"
-                               style="background-color: #6c757d; border: none; border-radius: 5px; font-weight: 500;">
+                            download="<?= htmlspecialchars($homepage_event['event_name']) ?>_Poster.<?= pathinfo($homepage_event['poster'], PATHINFO_EXTENSION) ?>"
+                            class="btn btn-secondary py-2 px-4"
+                            style="background-color: #6c757d; border: none; border-radius: 5px; font-weight: 500;">
                                 Download Poster
                             </a>
                         </div>
                     </div>
                     
-                    <div style="border-top: 4px solid #FFC107; width: 80px; margin-bottom: 10px;"></div>
-                        <h3 class="fw-bold text-dark mb-3" style="color: #495057;">SCHEDULE</h3>
+                    <br>
+                    <!-- SCHEDULE SECTION -->
+                    <div class="mb-4">
+                        <div style="border-top: 4px solid #FFC107; width: 80px; margin-bottom: 20px;"></div>
+                        
+                        <h3 class="fw-bold text-dark mb-4">SCHEDULE</h3>
+                        
+                        <div class="">
+                            <?php if(!empty($schedules)): ?>
+                                <div class="schedule-list">
+                                    <?php foreach($schedules as $schedule): ?>
+                                        <div class="schedule-item mb-4">
+                                            
+                                            <h5 class="fw-bold text-dark mb-1">
+                                                <?= htmlspecialchars($schedule['description']) ?>
+                                            </h5>
+                                            
+                                            <div class="text-secondary" style="font-style: italic;">
+                                                
+                                                <?php if(!empty($schedule['date_old'])): ?>
+                                                    <div class="text-decoration-line-through opacity-50 small lh-1 mb-1">
+                                                        <?= htmlspecialchars($schedule['date_old']) ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                                
+                                                <div class="lh-1">
+                                                    <?= date('F jS Y', strtotime($schedule['date_new'])) ?>
+                                                </div>
 
-                    <?php if(!empty($homepage_event['link_registration'])): ?>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <p class="text-muted small mb-0">Schedule will be available soon</p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <br>
+                    <!-- DOWNLOADABLE FILES SECTION -->
                     <div class="mb-4">
-                        <a href="<?= htmlspecialchars($homepage_event['link_registration']) ?>" 
-                           class="btn btn-danger w-100 py-2" 
-                           target="_blank">
-                            <i class="bi bi-box-arrow-up-right"></i> Register Now
-                        </a>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <?php if(!empty($homepage_event['linkpage_event'])): ?>
-                    <div class="mb-4">
-                        <a href="<?= htmlspecialchars($homepage_event['linkpage_event']) ?>" 
-                           class="btn btn-outline-danger w-100">
-                            <i class="bi bi-info-circle"></i> More Information
-                        </a>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <div class="mb-4 p-3 border rounded bg-light" style="min-height: 100px;">
-                        <h6 class="fw-bold mb-2 text-muted"><i class="bi bi-clock"></i> Schedule</h6>
-                        <p class="text-muted small mb-0">Schedule will be available soon</p>
-                    </div>
-                    
-                    <div class="mb-4 p-3 border rounded bg-light" style="min-height: 100px;">
-                        <h6 class="fw-bold mb-2 text-muted"><i class="bi bi-file-earmark-arrow-down"></i> Downloadable Files</h6>
-                        <p class="text-muted small mb-0">Files will be available soon</p>
+                        <div style="border-top: 4px solid #FFC107; width: 80px; margin-bottom: 20px;"></div>
+                        
+                        <h3 class="fw-bold text-dark mb-4">DOWNLOADABLE FILES</h3>
+                        
+                        <div class="">
+                            <?php if(!empty($downloadable_files)): ?>
+                                <div class="download-files-list">
+                                    <?php foreach($downloadable_files as $file): ?>
+                                        <div class="download-file-item">
+                                            <a href="../admin/download.php?id=<?= $file['file_id'] ?>" class="d-flex align-items-center">
+                                                <i class="bi bi-file-earmark-arrow-down"></i>
+                                                <span><?= htmlspecialchars($file['file_name']) ?></span>
+                                            </a>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <p class="text-muted small mb-0">Files will be available soon</p>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -184,11 +252,29 @@ include "includes/config.php";
         <?php endif; ?>
 
     </div>
-    <!-- End Main Content -->
-
-    <!-- Footer -->
     <?php include("includes/frontfooter.php"); ?>
 
+    <!--poster full-->
+    <div class="modal fade" id="posterModal" tabindex="-1" aria-labelledby="posterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-transparent border-0">
+            
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-0 text-center">
+                <img src="../admin/images/events/<?= $homepage_event['poster'] ?>" 
+                    class="img-fluid rounded shadow" 
+                    style="max-height: 300vh; width: auto; max-width: 100%;" 
+                    alt="Full Poster">
+            </div>
+
+            </div>
+        </div>
+    </div>
+
 </body>
+
 <script type="text/javascript" src="js/bootstrap.bundle.min.js"></script>
 </html>

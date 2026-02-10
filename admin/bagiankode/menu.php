@@ -15,6 +15,7 @@
                             </a>
                             <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
+
                                     <a class="nav-link" href="inputprofile.php">Manage Profile</a>
                                     <a class="nav-link" href="inputevents.php">Manage Events</a>
                                     <a class="nav-link" href="inputpage.php">Manage Page</a>
@@ -26,7 +27,7 @@
                                     <a class="nav-link" href="inputmenu.php">Manage Menu</a>
                                     <a class="nav-link" href="inputslider.php">Manage Slider</a>
                                     <a class="nav-link" href="inputsosmed.php">Manage Sosmed</a>
-                                    <a class="nav-link" href="inputlink.php">Manage Link</a>
+                                    <a class="nav-link" href="inputlinks.php">Manage Link</a>
 
                                 </nav>
                             </div>
@@ -62,14 +63,60 @@
                                 </nav>
                             </div>
                             <div class="sb-sidenav-menu-heading">Addons</div>
+
                             <a class="nav-link" href="charts.html">
                                 <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
                                 Charts
                             </a>
-                            <a class="nav-link" href="tables.html">
+                            <a class="nav-link" href="inputprofile.php">
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Tables
+                                Manage Profile
                             </a>
+                            <a class="nav-link" href="inputevents.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Events
+                            </a>
+                            <a class="nav-link" href="inputpage.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Page
+                            </a>
+                            <a class="nav-link" href="inputschedule.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Schedule
+                            </a>
+                            <a class="nav-link" href="inputspeaker.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Speakers
+                            </a>
+                             <a class="nav-link" href="inputdownloadablefiles.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Downloadable File
+                            </a>
+                            <a class="nav-link" href="inputsupported.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Supported
+                            </a>
+                            <a class="nav-link" href="inputsponsor.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Sponsor
+                            </a>
+                            <a class="nav-link" href="inputmenu.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Menu
+                            </a>
+                            <a class="nav-link" href="inputslider.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Slider
+                            </a>
+                            <a class="nav-link" href="inputsosmed.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Sosial Media
+                            </a>
+                            <a class="nav-link" href="inputlinks.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Links
+                            </a>
+                             
                         </div>
                     </div>
                     <div class="sb-sidenav-footer">

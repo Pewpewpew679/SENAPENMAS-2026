@@ -44,7 +44,7 @@ $base_url = "/senapenmas-2026/frontend/";
         .page-header {
             background: linear-gradient(135deg, #A01626 0%, #7a1a00 100%);
             padding: 40px 0;
-            margin-bottom: 40px;
+            margin-bottom: 60px;
         }
         
         .page-header h1 {
@@ -91,6 +91,7 @@ $base_url = "/senapenmas-2026/frontend/";
             max-height: 500px;
             object-fit: cover;
             border-radius: 10px;
+            margin-top: 10px;
             margin-bottom: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
@@ -127,6 +128,15 @@ $base_url = "/senapenmas-2026/frontend/";
         .page-content ul, .page-content ol { margin-bottom: 20px; padding-left: 30px; }
         .page-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
         .page-content table { width: 100%; margin: 20px 0; }
+
+        .page-content > h1:first-child,
+        .page-content > h2:first-child,
+        .page-content > h3:first-child,
+        .page-content > h4:first-child,
+        .page-content > h5:first-child,
+        .page-content > h6:first-child {
+            margin-top: 0;
+        }
     </style>
 </head>
 <body>

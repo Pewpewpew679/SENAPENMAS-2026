@@ -104,26 +104,85 @@ $main_menus = mysqli_query($conn, $menu_query);
 <style>
 /* Pastikan body tidak terpotong (opsional, tergantung struktur main.php) */
 body {
-    overflow-x: hidden; /* Mencegah scroll horizontal jika ada elemen terlalu lebar */
+    overflow-x: hidden;
 }
 
 /* Mempercantik tampilan navbar saat sticky (opsional) */
 .navbar.sticky-top {
     transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* === TAMBAHAN: Hilangkan highlight biru saat klik/fokus === */
+.navbar-nav .nav-link:focus,
+.navbar-nav .nav-link:active,
+.navbar-nav .nav-link:focus-visible {
+    color: #333 !important;
+    background-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* === TAMBAHAN: Hover nav-link jadi hitam === */
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-item.dropdown:hover > .nav-link {
+    color: #111 !important;
+}
+
+/* === TAMBAHAN: Dropdown lebih rapi === */
+.dropdown-menu {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 0;
+}
+
+/* === TAMBAHAN: Hover item abu-abu, bukan biru === */
+.dropdown-item {
+    border-radius: 6px;
+    margin: 1px 6px;
+    width: calc(100% - 12px);
+}
+
+.dropdown-item:hover {
+    background-color: #f2f2f2 !important;
+    color: #111 !important;
+}
+
+.dropdown-item:focus,
+.dropdown-item:active,
+.dropdown-item:focus-visible {
+    background-color: #e8e8e8 !important;
+    color: #111 !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 </style>
 
 <script>
 // Script agar dropdown muncul saat hover
-document.querySelectorAll('.nav-item.dropdown').forEach(function(item) {
-    item.addEventListener('mouseover', function() {
-        let menu = this.querySelector('.dropdown-menu');
-        if(menu) menu.classList.add('show');
-    });
+// Pakai timer global agar antar dropdown tidak saling berebutan
+(function() {
+    let closeTimer = null;
+    let currentOpen = null;
 
-    item.addEventListener('mouseout', function() {
-        let menu = this.querySelector('.dropdown-menu');
-        if(menu) menu.classList.remove('show');
+    document.querySelectorAll('.nav-item.dropdown').forEach(function(item) {
+        item.addEventListener('mouseenter', function() {
+            clearTimeout(closeTimer);
+            if (currentOpen && currentOpen !== this) {
+                currentOpen.querySelector('.dropdown-menu').classList.remove('show');
+            }
+            this.querySelector('.dropdown-menu').classList.add('show');
+            currentOpen = this;
+        });
+
+        item.addEventListener('mouseleave', function() {
+            let self = this;
+            closeTimer = setTimeout(function() {
+                self.querySelector('.dropdown-menu').classList.remove('show');
+                if (currentOpen === self) currentOpen = null;
+            }, 120);
+        });
     });
-});
+})();
 </script>

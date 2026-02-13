@@ -134,7 +134,7 @@ if (isset($_POST['Update'])) {
                                                Edit
                                             </a>
                                             <a href="hapusschedule.php?id=<?= $row['schedule_id'] ?>" 
-                                               style="text-decoration: none; color: red;"
+                                               style="text-decoration: none;"
                                                onclick="return confirm('Hapus data ini?')">Delete</a>
                                         </td>
                                     </tr>

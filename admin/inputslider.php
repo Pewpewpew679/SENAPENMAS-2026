@@ -129,28 +129,33 @@ if (isset($_POST['Update'])) {
                                         <td><img src="<?= $img_path ?>" width="80" class="img-thumbnail"></td>
                                         <td><?= htmlspecialchars($row['slider_title']) ?></td>
                                         <td><?= $row['order_number'] ?></td>
+
                                         <td>
-                                            <span class="badge <?= $row['status'] == 'Active' ? 'bg-primary' : 'bg-danger' ?>">
+                                            <span class="<?= $row['status'] == 'Active' ? 'text-primary' : 'text-danger' ?>">
                                                 <?= $row['status'] ?>
                                             </span>
                                         </td>
+
                                         <td>
                                             <a href="javascript:void(0)" 
-                                               class="btn-edit text-primary me-3" 
-                                               style="text-decoration: none;"
-                                               data-bs-toggle="modal" 
-                                               data-bs-target="#editSliderModal"
-                                               data-id="<?= $row['slider_id'] ?>"
-                                               data-image="<?= $row['slider_image'] ?>"
-                                               data-title="<?= htmlspecialchars($row['slider_title']) ?>"
-                                               data-link="<?= htmlspecialchars($row['slider_link']) ?>"
-                                               data-order="<?= $row['order_number'] ?>"
-                                               data-status="<?= $row['status'] ?>">
-                                               Edit
+                                            class="btn-edit" 
+                                            style="text-decoration: none; margin-right: 30px;"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editSliderModal"
+                                            data-id="<?= $row['slider_id'] ?>"
+                                            data-image="<?= $row['slider_image'] ?>"
+                                            data-title="<?= htmlspecialchars($row['slider_title']) ?>"
+                                            data-link="<?= htmlspecialchars($row['slider_link']) ?>"
+                                            data-order="<?= $row['order_number'] ?>"
+                                            data-status="<?= $row['status'] ?>">
+                                            Edit
                                             </a>
+                                            
                                             <a href="hapusslider.php?id=<?= $row['slider_id'] ?>&image=<?= $row['slider_image'] ?>" 
-                                               class="text-danger" style="text-decoration: none;"
-                                               onclick="return confirm('Hapus slider ini?')">Delete</a>
+                                            style="text-decoration: none;"
+                                            onclick="return confirm('Hapus slider ini?')">
+                                            Delete
+                                            </a>
                                         </td>
                                     </tr>
                                     <?php } ?>

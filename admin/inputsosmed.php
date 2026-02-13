@@ -106,18 +106,20 @@ if (isset($_POST['Update'])) {
                                         </td>
                                         <td>
                                             <a href="javascript:void(0)" 
-                                               class="btn-edit btn btn-warning btn-sm"
-                                               data-bs-toggle="modal" 
-                                               data-bs-target="#editModal"
-                                               data-id="<?= $row['social_id'] ?>"
-                                               data-platform="<?= $row['platform_name'] ?>"
-                                               data-link="<?= $row['social_link'] ?>">
-                                               Edit
+                                            class="btn-edit me-2" 
+                                            style="text-decoration: none; margin-right: 30px;"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editModal"
+                                            data-id="<?= $row['social_id'] ?>"
+                                            data-platform="<?= htmlspecialchars($row['platform_name']) ?>"
+                                            data-link="<?= htmlspecialchars($row['social_link']) ?>">
+                                            Edit
                                             </a>
+
                                             <a href="hapussosmed.php?id=<?= $row['social_id'] ?>" 
-                                               class="btn btn-danger btn-sm"
-                                               onclick="return confirm('Hapus data ini?')">
-                                               Delete
+                                            style="text-decoration: none;"
+                                            onclick="return confirm('Hapus data ini?')">
+                                            Delete  
                                             </a>
                                         </td>
                                     </tr>

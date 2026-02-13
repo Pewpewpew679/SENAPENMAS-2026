@@ -91,20 +91,22 @@ if (isset($_POST['Update'])) {
                                         <td><a href="<?= htmlspecialchars($row['link_url']) ?>" target="_blank"><?= htmlspecialchars($row['link_url']) ?></a></td>
                                         <td><?= $row['link_order'] ?></td>
                                         <td>
-                                            <a href="javascript:void(0)"   
-                                                class="btn btn-warning btn-sm btn-edit"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#editLinksModal"
-                                                data-id="<?= $row['link_id'] ?>"
-                                                data-name="<?= htmlspecialchars($row['link_name']) ?>"
-                                                data-url="<?= htmlspecialchars($row['link_url']) ?>"
-                                                data-order="<?= $row['link_order'] ?>">
-                                                Edit
+                                            <a href="javascript:void(0)" 
+                                            class="btn-edit me-2" 
+                                            style="text-decoration: none; margin-right: 30px;"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editLinksModal"
+                                            data-id="<?= $row['link_id'] ?>"
+                                            data-name="<?= htmlspecialchars($row['link_name']) ?>"
+                                            data-url="<?= htmlspecialchars($row['link_url']) ?>"
+                                            data-order="<?= $row['link_order'] ?>">
+                                            Edit
                                             </a>
+
                                             <a href="hapuslinks.php?id=<?= $row['link_id'] ?>"
-                                                class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Hapus data ini?')">
-                                                Delete
+                                            style="text-decoration: none;"
+                                            onclick="return confirm('Hapus data ini?')">
+                                            Delete
                                             </a>
                                         </td>
                                     </tr>

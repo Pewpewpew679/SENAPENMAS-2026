@@ -195,7 +195,7 @@ if (isset($_POST['Update'])) {
                                         <td><img src="images/<?= htmlspecialchars($row['sponsor_logo']) ?>" width="90" class="img-thumbnail"></td>
                                         <td><?= htmlspecialchars($row['sponsor_name']) ?></td>
                                         <td><?= htmlspecialchars($use_event_id ? ($row['event_name'] ?? ($row['event_id'] ?? '-')) : ($row['event_name'] ?? '-')) ?></td>
-                                        <td><?= htmlspecialchars($row['website_link']) ?></td>
+                                        <td><a href="<?= htmlspecialchars($row['website_link']) ?>" target="_blank"><?= htmlspecialchars($row['website_link']) ?></a></td>
                                         <td>
                                             <a href="javascript:void(0)" class="btn-edit me-2" href="#"
                                                style="text-decoration: none; margin-right: 30px;"

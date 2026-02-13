@@ -116,6 +116,10 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Manage Links
                             </a>
+                            <a class="nav-link" href="inputpastconference.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manage Past Conference
+                            </a>
                              
                         </div>
                     </div>

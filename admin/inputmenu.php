@@ -1,5 +1,13 @@
 <?php
+ob_start();
 session_start();
+
+// Cek Login
+if (!isset($_SESSION['useremail'])) {
+    header("Location: login.php");
+    exit;
+}
+
 
 include "includes/config.php";
 

@@ -47,18 +47,22 @@
 
             /* --- 3. CLASS ALIGNMENT (SINKRONISASI DENGAN ADMIN) --- */
             
-            /* Rata Kiri: Gambar di kiri, teks mengalir di kanannya */
+            /* Rata Kiri: Gambar di kiri, teks tetap di bawah (tidak mengalir ke samping) */
             .event-description .image-left {
-                float: left;
-                margin: 0 20px 10px 0; /* Jarak kanan agar teks tidak nempel */
-                clear: left;
+                display: block;
+                margin-right: auto;
+                margin-bottom: 10px;
+                text-align: left;
+                clear: both;
             }
 
-            /* Rata Kanan: Gambar di kanan, teks mengalir di kirinya */
+            /* Rata Kanan: Gambar di kanan, teks tetap di bawah (tidak mengalir ke samping) */
             .event-description .image-right {
-                float: right;
-                margin: 0 0 10px 20px; /* Jarak kiri agar teks tidak nempel */
-                clear: right;
+                display: block;
+                margin-left: auto;
+                margin-bottom: 10px;
+                text-align: right;
+                clear: both;
             }
 
             /* Rata Tengah: Gambar sendirian di tengah baris */
@@ -66,8 +70,9 @@
                 display: block;
                 margin-left: auto;
                 margin-right: auto;
+                margin-bottom: 10px;
                 text-align: center;
-                clear: both; /* Memastikan tidak ada elemen lain di sampingnya */
+                clear: both;
             }
 
             /* 1. Mengurangi jarak antar paragraf di dalam deskripsi */

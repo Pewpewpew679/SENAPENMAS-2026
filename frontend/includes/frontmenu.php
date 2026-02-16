@@ -15,8 +15,8 @@ $profile = mysqli_fetch_assoc($profile_query);
 $admin_img_path = "/senapenmas-2026/admin/images/";
 // --------------------------
 
-// Ambil menu
-$menu_query = "SELECT * FROM menu WHERE parent_id IS NULL ORDER BY COALESCE(menu_order, 9999) ASC, menu_name ASC";
+// Ambil menu (hanya yang Published)
+$menu_query = "SELECT * FROM menu WHERE parent_id IS NULL AND status = 1 ORDER BY COALESCE(menu_order, 9999) ASC, menu_name ASC";
 $main_menus = mysqli_query($conn, $menu_query);
 ?>
 
@@ -53,7 +53,7 @@ $main_menus = mysqli_query($conn, $menu_query);
           $bold_class = ($menu_counter == 1) ? 'fw-bold' : '';
 
           // Cek Submenu
-          $submenu_query = "SELECT * FROM menu WHERE parent_id = " . $menu['menu_id'] . " ORDER BY COALESCE(menu_order, 9999) ASC, menu_name ASC";
+          $submenu_query = "SELECT * FROM menu WHERE parent_id = " . $menu['menu_id'] . " AND status = 1 ORDER BY COALESCE(menu_order, 9999) ASC, menu_name ASC";
           $submenus = mysqli_query($conn, $submenu_query);
           $has_submenu = mysqli_num_rows($submenus) > 0;
           

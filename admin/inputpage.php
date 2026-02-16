@@ -24,27 +24,11 @@
         $content    = mysqli_real_escape_string($conn, $_POST['page_content']);
         $pub_date   = $_POST['publish_date'];
         $status     = $_POST['status'];
-        
-        // Upload Cover
-        $cover_name = "";
-        if ($_FILES['page_cover']['name'] != "") {
-            $image_name = $_FILES['page_cover']['name'];
-            $tmp        = $_FILES['page_cover']['tmp_name'];
-            $ext        = pathinfo($image_name, PATHINFO_EXTENSION);
-            $new_cover  = time() . "_" . uniqid() . "." . $ext;
-            $folder     = "../frontend/images/pages/";
-
-            if (!is_dir($folder)) { mkdir($folder, 0777, true); }
-
-            if (move_uploaded_file($tmp, $folder . $new_cover)) {
-                $cover_name = $new_cover;
-            }
-        }
 
         $query = "INSERT INTO pages 
-                  (page_title, page_content, page_cover, publish_date, status) 
+                  (page_title, page_content, publish_date, status) 
                   VALUES 
-                  ('$page_title', '$content', '$cover_name', '$pub_date', '$status')";
+                  ('$page_title', '$content', '$pub_date', '$status')";
         
         if (mysqli_query($conn, $query)) {
             $page_id = mysqli_insert_id($conn);
@@ -78,32 +62,14 @@
     // ==========================================
     if (isset($_POST['Update'])) {
         $page_id    = (int) $_POST['page_id'];
-        $old_cover  = $_POST['old_cover'];
         
         $page_title = mysqli_real_escape_string($conn, $_POST['page_title']);
         $content    = mysqli_real_escape_string($conn, $_POST['page_content']);
         $pub_date   = $_POST['publish_date'];
         $status     = $_POST['status'];
 
-        $final_cover = $old_cover;
-
-        if ($_FILES['page_cover']['name'] != "") {
-            $image_name = $_FILES['page_cover']['name'];
-            $tmp        = $_FILES['page_cover']['tmp_name'];
-            $ext        = pathinfo($image_name, PATHINFO_EXTENSION);
-            $new_cover  = time() . "_" . uniqid() . "." . $ext;
-            $folder     = "../frontend/images/pages/";
-
-            if (move_uploaded_file($tmp, $folder . $new_cover)) {
-                $final_cover = $new_cover;
-                if ($old_cover != "" && file_exists($folder . $old_cover)) { 
-                    unlink($folder . $old_cover); 
-                }
-            }
-        }
-
         $query = "UPDATE pages SET 
-                  page_title='$page_title', page_content='$content', page_cover='$final_cover',
+                  page_title='$page_title', page_content='$content',
                   publish_date='$pub_date', status='$status'
                   WHERE page_id='$page_id'";
 
@@ -167,7 +133,7 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th width="30">No</th>
-                                            <th width="80">Cover</th>
+
                                             <th width="250">Page Title</th>
                                             <th width="100">Publish Status</th>
                                             <th width="150">Link Page</th>
@@ -181,15 +147,9 @@
                                         while ($row = mysqli_fetch_assoc($query)) {
                                             $statusText = '';
                                             if ($row['status'] == 'Publish') {
-                                                $statusText = '<span class="text-success">Publish</span>';
+                                                $statusText = '<span class="text-primary">Publish</span>';
                                             } else {
-                                                $statusText = '<span class="text-secondary">Draft</span>';
-                                            }
-                                            
-                                            if (!empty($row['page_cover']) && file_exists('../frontend/images/pages/' . $row['page_cover'])) {
-                                                $coverImage = '../frontend/images/pages/' . $row['page_cover'];
-                                            } else {
-                                                $coverImage = 'images/no-image-found.png';
+                                                $statusText = '<span class="text-danger">Unpublish</span>';
                                             }
                                             
                                             $page_slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $row['page_title'])));
@@ -202,9 +162,6 @@
                                         ?>
                                         <tr>
                                             <td><?= $no++ ?></td>
-                                            <td>
-                                                <img src="<?= $coverImage ?>" width="70" class="img-thumbnail" loading="lazy">
-                                            </td>
                                             <td><?= htmlspecialchars($row['page_title']) ?></td>
                                             <td><?= $statusText ?></td>
                                             <td><a href="<?= $page_link ?>" target="_blank"><?= $page_link ?></a></td>
@@ -212,7 +169,7 @@
                                                 <a href="#" class="text-primary me-2 btn-edit" style="text-decoration:none;"
                                                    data-bs-toggle="modal" data-bs-target="#editPageModal"
                                                    data-id="<?= $row['page_id'] ?>"
-                                                   data-cover="<?= $row['page_cover'] ?>"
+
                                                    data-title="<?= htmlspecialchars($row['page_title']) ?>"
                                                    data-content="<?= htmlspecialchars($row['page_content']) ?>"
                                                    data-pubdate="<?= $row['publish_date'] ?>"
@@ -223,7 +180,7 @@
                                                    Edit
                                                 </a>
 
-                                                <a href="hapuspage.php?id=<?= $row['page_id'] ?>&cover=<?= $row['page_cover'] ?>" 
+                                                <a href="hapuspage.php?id=<?= $row['page_id'] ?>" 
                                                    class="text-primary" style="text-decoration:none;"
                                                    onclick="return confirm('Yakin hapus data ini?')">Delete</a>
                                             </td>
@@ -241,7 +198,7 @@
     </div>
 
     <div class="modal fade" id="addPageModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-custom-width">
             <div class="modal-content">
                 <form method="POST" enctype="multipart/form-data">
                     <div class="modal-header">
@@ -259,11 +216,7 @@
                             <textarea name="page_content" id="editor_add"></textarea>
                         </div>
                         
-                        <div class="mb-3">
-                            <label class="form-label">Cover (JPG/PNG)</label>
-                            <input type="file" name="page_cover" class="form-control" accept=".jpg,.jpeg,.png">
-                            <small class="text-muted">Max: 5MB</small>
-                        </div>
+
                         
                         <div class="mb-3">
                             <label class="form-label">Make This Page As a Menu?*</label>
@@ -298,9 +251,8 @@
                         <div class="mb-3">
                             <label class="form-label">Status*</label>
                             <select name="status" class="form-select">
-                                <option value="Draft">Draft</option>
                                 <option value="Publish">Publish</option>
-                                <option value="Un Publish">Un Publish</option>
+                                <option value="Unpublish">Unpublish</option>
                             </select>
                         </div>
                     </div>
@@ -314,7 +266,7 @@
     </div>
 
     <div class="modal fade" id="editPageModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-custom-width">
             <div class="modal-content">
                 <form method="POST" enctype="multipart/form-data">
                     <div class="modal-header">
@@ -323,7 +275,6 @@
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="page_id" id="edit-id">
-                        <input type="hidden" name="old_cover" id="edit-old-cover">
                         
                         <div class="mb-3">
                             <label class="form-label">Page Title*</label>
@@ -333,13 +284,6 @@
                         <div class="mb-3">
                             <label class="form-label">Page Content*</label>
                             <textarea name="page_content" id="editor_edit"></textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Cover</label><br>
-                            <img src="" id="edit-preview" width="100" class="img-thumbnail mb-2">
-                            <input type="file" name="page_cover" class="form-control" accept=".jpg,.jpeg,.png">
-                            <small class="text-muted">Max: 5MB</small>
                         </div>
                         
                         <div class="mb-3">
@@ -375,9 +319,8 @@
                         <div class="mb-3">
                             <label class="form-label">Status*</label>
                             <select name="status" id="edit-status" class="form-select">
-                                <option value="Draft">Draft</option>
                                 <option value="Publish">Publish</option>
-                                <option value="Un Publish">Un Publish</option>
+                                <option value="Unpublish">Unpublish</option>
                             </select>
                         </div>
                     </div>
@@ -394,6 +337,12 @@
     
     <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
 
+    <style>
+        .modal-custom-width {
+            max-width: 1000px; /* Pas dengan Editor 940px + Padding */
+        }
+    </style>
+
     <input type="file" id="hidden-image-upload" style="display: none;" accept="image/jpeg, image/png, image/gif, image/webp">
 
     <script>
@@ -405,6 +354,16 @@
         CKEDITOR.addCss('img { max-width: 100%; height: auto !important; }');
         CKEDITOR.addCss('.cke_widget_wrapper { max-width: 100% !important; }');
 
+        // CSS ALIGNMENT (Sinkronisasi dengan page.php .page-content)
+        // Ditambahkan !important agar mengalahkan style bawaan widget CKEditor (image2)
+        CKEDITOR.addCss('.image-left { display: block !important; margin-left: 0 !important; margin-right: auto !important; margin-bottom: 10px !important; text-align: left !important; clear: both !important; }');
+        CKEDITOR.addCss('.image-right { display: block !important; margin-left: auto !important; margin-right: 0 !important; margin-bottom: 10px !important; text-align: right !important; clear: both !important; }');
+        CKEDITOR.addCss('.image-center { display: block !important; margin-left: auto !important; margin-right: auto !important; margin-bottom: 10px !important; text-align: center !important; clear: both !important; }');
+
+        // Memaksa Editor meniru jarak spasi page.php
+        CKEDITOR.addCss('p { margin-top: 0; margin-bottom: 20px; }');
+        CKEDITOR.addCss('h1, h2, h3, h4, h5, h6 { margin-top: 30px; margin-bottom: 15px; font-weight: bold; line-height: 1.2; }');
+        
         function createCustomEditor(elementId) {
             if (CKEDITOR.instances[elementId]) {
                 CKEDITOR.instances[elementId].destroy(true);
@@ -412,6 +371,7 @@
 
             CKEDITOR.replace(elementId, {
                 height: 400,
+                width: '940px', // Lebar Fix, Stabil seperti inputevents (750px) tapi versi lebar
                 
                 // Plugin Lengkap + Image2 (Resize)
                 extraPlugins: 'uploadimage,image2,widget,lineutils,widgetselection,notification,filetools', 
@@ -484,7 +444,6 @@
                     
                     // Isi Form
                     document.getElementById('edit-id').value = id;
-                    document.getElementById('edit-old-cover').value = this.getAttribute('data-cover');
                     document.getElementById('edit-title').value = this.getAttribute('data-title');
                     document.getElementById('edit-pubdate').value = this.getAttribute('data-pubdate');
                     document.getElementById('edit-status').value = this.getAttribute('data-status');
@@ -498,14 +457,6 @@
                         document.getElementById('edit-menu-order').value = this.getAttribute('data-menuorder');
                     } else {
                         document.getElementById('edit-menu-options').style.display = 'none';
-                    }
-
-                    // Preview Cover
-                    let coverFile = this.getAttribute('data-cover');
-                    if (coverFile && coverFile != '') {
-                        document.getElementById('edit-preview').src = '../frontend/images/pages/' + coverFile;
-                    } else {
-                        document.getElementById('edit-preview').src = 'images/no-image-found.png';
                     }
 
                     // Isi CKEditor
@@ -554,7 +505,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.uploaded === 1) {
-                    var imgHtml = '<img src="' + data.url + '" width="500" alt="image" />';
+                    var imgHtml = '<img src="' + data.url + '" style="max-width: 100%; height: auto;" width="1200" alt="image" />';
                     CKEDITOR.instances[targetEditorId].insertHtml(imgHtml);
                 } else {
                     alert("Upload Gagal: " + (data.error ? data.error.message : 'Error'));

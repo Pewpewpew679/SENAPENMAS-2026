@@ -3,6 +3,49 @@
 include "includes/config.php";
 if (session_status() == PHP_SESSION_NONE) session_start();
 
+// Restructure sponsor_content table untuk per-event
+$tblCheck = mysqli_query($conn, "SHOW TABLES LIKE 'sponsor_content'");
+if ($tblCheck && mysqli_num_rows($tblCheck) > 0) {
+    $colCheck = mysqli_query($conn, "SHOW COLUMNS FROM sponsor_content LIKE 'event_id'");
+    if (!$colCheck || mysqli_num_rows($colCheck) == 0) {
+        // Old structure (global) - rebuild for per-event
+        mysqli_query($conn, "DROP TABLE sponsor_content");
+        mysqli_query($conn, "CREATE TABLE sponsor_content (id INT AUTO_INCREMENT PRIMARY KEY, event_id INT NOT NULL UNIQUE, content TEXT DEFAULT '', status TINYINT(1) NOT NULL DEFAULT 1)");
+    }
+} else {
+    mysqli_query($conn, "CREATE TABLE sponsor_content (id INT AUTO_INCREMENT PRIMARY KEY, event_id INT NOT NULL UNIQUE, content TEXT DEFAULT '', status TINYINT(1) NOT NULL DEFAULT 1)");
+}
+
+// Auto-populate sponsor_content untuk setiap event yang punya sponsor
+$ews_res = mysqli_query($conn, "SELECT DISTINCT s.event_id FROM sponsors s WHERE s.event_id IS NOT NULL");
+if ($ews_res) {
+    while ($r = mysqli_fetch_assoc($ews_res)) {
+        $eid = intval($r['event_id']);
+        $check = mysqli_query($conn, "SELECT id FROM sponsor_content WHERE event_id = $eid");
+        if (mysqli_num_rows($check) == 0) {
+            mysqli_query($conn, "INSERT INTO sponsor_content (event_id, content, status) VALUES ($eid, '', 1)");
+        }
+    }
+}
+
+// Ambil semua event settings (untuk admin UI)
+$event_settings = [];
+$es_res = mysqli_query($conn, "SELECT sc.*, e.event_name, e.event_year FROM sponsor_content sc JOIN events e ON sc.event_id = e.event_id ORDER BY e.event_year DESC, e.event_name ASC");
+if ($es_res) {
+    while ($r = mysqli_fetch_assoc($es_res)) { $event_settings[] = $r; }
+}
+
+// Simpan deskripsi + status per event
+if (isset($_POST['SaveEventDesc'])) {
+    $event_id = intval($_POST['event_id']);
+    $desc = mysqli_real_escape_string($conn, $_POST['event_description']);
+    $status = intval($_POST['event_status']);
+    mysqli_query($conn, "UPDATE sponsor_content SET content = '$desc', status = $status WHERE event_id = $event_id");
+    $_SESSION['sponsor_success'] = 'Pengaturan event sponsor berhasil disimpan.';
+    header("Location: inputsponsor.php");
+    exit;
+}
+
 // Ambil daftar events untuk dropdown (value = event_name)
 $events = [];
 $events_res = mysqli_query($conn, "SELECT event_id, event_name FROM events ORDER BY event_name");
@@ -152,9 +195,29 @@ if (isset($_POST['Update'])) {
 
                 <div class="card mb-4">
                     <div class="card-body">
-                        <button class="btn btn-success btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#addSponsorModal">
-                            <i class="bi bi-plus-lg"></i> Add Sponsor
-                        </button>
+                        <!-- TOP BAR: Add Sponsor + Event Dropdown + Status -->
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addSponsorModal">
+                                <i class="bi bi-plus-lg"></i> Add Sponsor
+                            </button>
+
+                            <?php if (!empty($event_settings)): ?>
+                            <select id="event-select" class="form-select form-select-sm" style="width: auto; min-width: 200px;">
+                                <?php foreach ($event_settings as $i => $es): ?>
+                                    <option value="<?= $es['event_id'] ?>" <?= $i === 0 ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($es['event_name']) ?> (<?= $es['event_year'] ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+
+                            <select id="event-status" class="form-select form-select-sm" style="width: auto;">
+                                <option value="1">Publish</option>
+                                <option value="0">Unpublish</option>
+                            </select>
+
+                            <span id="status-badge"></span>
+                            <?php endif; ?>
+                        </div>
 
                         <?php if (!empty($_SESSION['sponsor_error'])): ?>
                             <div class="alert alert-danger alert-sm"><?= htmlspecialchars($_SESSION['sponsor_error']) ?></div>
@@ -165,22 +228,22 @@ if (isset($_POST['Update'])) {
                             <?php unset($_SESSION['sponsor_success']); ?>
                         <?php endif; ?>
 
+                        <!-- SPONSOR TABLE -->
                         <div class="table-responsive">
-                            <table id="sponsorTable" class="table table-sm table-bordered table-striped align-middle">
+                            <table id="sponsorTable" class="table table-sm table-bordered table-hover align-middle" style="font-size: 0.9rem;">
                                 <thead class="table-light">
                                     <tr>
-                                        <th width="40">No</th>
-                                        <th width="100">Image</th>
-                                        <th>Sponsor Name</th>
-                                        <th>Event</th>
-                                        <th>Link</th>
-                                        <th width="120">Action</th>
+                                        <th width="30">No</th>
+                                        <th width="80">Image</th>
+                                        <th width="200">Sponsor Name</th>
+                                        <th width="180">Event</th>
+                                        <th width="150" style="max-width: 150px;">Link</th>
+                                        <th width="100">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
                                     $no = 1;
-                                    // Choose query depending on whether sponsors uses event_id
                                     if ($use_event_id) {
                                         $query = mysqli_query($conn, "SELECT s.*, e.event_name FROM sponsors s LEFT JOIN events e ON s.event_id = e.event_id ORDER BY COALESCE(s.order_number, 9999) ASC, s.sponsor_name ASC");
                                     } else {
@@ -190,12 +253,12 @@ if (isset($_POST['Update'])) {
                                     if ($query) {
                                         while ($row = mysqli_fetch_assoc($query)) {
                                     ?>
-                                    <tr>
+                                    <tr data-event-id="<?= htmlspecialchars($row['event_id'] ?? '') ?>">
                                         <td><?= $no++ ?></td>
                                         <td><img src="images/<?= htmlspecialchars($row['sponsor_logo']) ?>" width="90" class="img-thumbnail"></td>
                                         <td><?= htmlspecialchars($row['sponsor_name']) ?></td>
                                         <td><?= htmlspecialchars($use_event_id ? ($row['event_name'] ?? ($row['event_id'] ?? '-')) : ($row['event_name'] ?? '-')) ?></td>
-                                        <td><a href="<?= htmlspecialchars($row['website_link']) ?>" target="_blank"><?= htmlspecialchars($row['website_link']) ?></a></td>
+                                        <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><a href="<?= htmlspecialchars($row['website_link']) ?>" target="_blank" title="<?= htmlspecialchars($row['website_link']) ?>"><?= htmlspecialchars($row['website_link']) ?></a></td>
                                         <td>
                                             <a href="javascript:void(0)" class="btn-edit me-2" href="#"
                                                style="text-decoration: none; margin-right: 30px;"
@@ -219,6 +282,24 @@ if (isset($_POST['Update'])) {
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- EVENT DESCRIPTION -->
+                        <?php if (!empty($event_settings)): ?>
+                        <div id="event-settings-section" style="margin-top: 20px; border-top: 1px solid #dee2e6; padding-top: 20px;">
+                            <form method="POST">
+                                <input type="hidden" name="event_id" id="form-event-id" value="">
+                                <input type="hidden" name="event_status" id="form-event-status" value="1">
+                                <h6 class="mb-3"><i class="bi bi-card-text"></i> Event Description</h6>
+                                <textarea name="event_description" id="editor_sponsor"></textarea>
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button type="submit" name="SaveEventDesc" class="btn btn-success btn-sm">
+                                        <i class="bi bi-check-lg"></i> Save Event Settings
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <?php endif; ?>
+
                     </div>
                 </div>
             </div>
@@ -322,34 +403,194 @@ if (isset($_POST['Update'])) {
 
 <?php include "bagiankode/jsscript.php"; ?>
 
+<script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
+
+<input type="file" id="hidden-image-upload" style="display: none;" accept="image/jpeg, image/png, image/gif, image/webp">
+
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Inisialisasi DataTable
-    if (document.getElementById("sponsorTable")) {
-        new simpleDatatables.DataTable("#sponsorTable");
+    CKEDITOR.config.versionCheck = false;
+    CKEDITOR.addCss('img { max-width: 100%; height: auto !important; }');
+    CKEDITOR.addCss('.cke_widget_wrapper { max-width: 100% !important; }');
+    CKEDITOR.addCss('.image-left { display: block !important; margin-left: 0 !important; margin-right: auto !important; margin-bottom: 10px !important; text-align: left !important; clear: both !important; }');
+    CKEDITOR.addCss('.image-right { display: block !important; margin-left: auto !important; margin-right: 0 !important; margin-bottom: 10px !important; text-align: right !important; clear: both !important; }');
+    CKEDITOR.addCss('.image-center { display: block !important; margin-left: auto !important; margin-right: auto !important; margin-bottom: 10px !important; text-align: center !important; clear: both !important; }');
+    CKEDITOR.addCss('p { margin-top: 0; margin-bottom: 1rem; }');
+
+    function createCustomEditor(elementId) {
+        if (CKEDITOR.instances[elementId]) {
+            CKEDITOR.instances[elementId].destroy(true);
+        }
+        CKEDITOR.replace(elementId, {
+            height: 300,
+            width: '100%',
+            extraPlugins: 'uploadimage,image2,widget,lineutils,widgetselection,notification,filetools',
+            removePlugins: 'image,easyimage,cloudservices',
+            image2_alignClasses: ['image-left', 'image-center', 'image-right'],
+            image2_disableResizer: false,
+            allowedContent: true,
+            toolbar: [
+                { name: 'document', items: [ 'Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
+                { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+                { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+                '/',
+                { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'CopyFormatting', 'RemoveFormat' ] },
+                { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
+                { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+                { name: 'insert', items: [ 'BtnCustomImage', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe' ] },
+                '/',
+                { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+                { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+                { name: 'tools', items: [ 'Maximize', 'ShowBlocks' ] }
+            ],
+            on: {
+                pluginsLoaded: function() {
+                    var editor = this;
+                    editor.addCommand('cmdOpenUpload', {
+                        exec: function(editor) {
+                            var input = document.getElementById('hidden-image-upload');
+                            input.setAttribute('data-target', elementId);
+                            input.click();
+                        }
+                    });
+                    editor.ui.addButton('BtnCustomImage', {
+                        label: 'Upload Gambar',
+                        command: 'cmdOpenUpload',
+                        toolbar: 'insert',
+                        icon: 'https://cdn-icons-png.flaticon.com/512/3342/3342137.png'
+                    });
+                }
+            }
+        });
     }
 
-    // Fungsi klik tombol Edit
-    const editButtons = document.querySelectorAll('.btn-edit');
-    editButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            const id     = this.getAttribute('data-id');
-            const image  = this.getAttribute('data-image');
-            const sponsor_name  = this.getAttribute('data-sponsor-name');
-            const event  = this.getAttribute('data-event');
-            const link   = this.getAttribute('data-link');
-            const order  = this.getAttribute('data-order');
+    // Data per-event dari PHP
+    var eventData = <?php echo json_encode(array_map(function($es) {
+        return ['event_id' => $es['event_id'], 'content' => $es['content'], 'status' => $es['status']];
+    }, $event_settings)); ?>;
 
-            document.getElementById('edit-sponsor-id').value = id;
-            document.getElementById('edit-old-image').value = image;
-            document.getElementById('edit-sponsor-name').value = sponsor_name;
-            if (document.getElementById('edit-event')) document.getElementById('edit-event').value = event;
-            document.getElementById('edit-link').value = link;
-            document.getElementById('edit-order').value = order;
-            document.getElementById('edit-preview').src = 'images/' + image;
+    var eventDataMap = {};
+    eventData.forEach(function(item) { eventDataMap[item.event_id] = item; });
+
+    var editorInitialized = false;
+
+    function filterTable(eventId) {
+        var rows = document.querySelectorAll('#sponsorTable tbody tr');
+        rows.forEach(function(row) {
+            if (eventId === 'all' || row.getAttribute('data-event-id') === eventId) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
         });
+    }
+
+    function loadEventData(eventId) {
+        var data = eventDataMap[eventId];
+        if (!data) return;
+
+        // Update status dropdown & sync hidden field
+        document.getElementById('event-status').value = data.status;
+        document.getElementById('form-event-id').value = eventId;
+        document.getElementById('form-event-status').value = data.status;
+
+        // Update status badge
+        var badge = document.getElementById('status-badge');
+        if (data.status == 1) {
+            badge.innerHTML = '<span class="badge bg-primary">Publish</span>';
+        } else {
+            badge.innerHTML = '<span class="badge bg-danger">Unpublish</span>';
+        }
+
+        // Load CKEditor content
+        if (editorInitialized && CKEDITOR.instances['editor_sponsor']) {
+            CKEDITOR.instances['editor_sponsor'].setData(data.content || '');
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Fungsi klik tombol Edit sponsor
+        const editButtons = document.querySelectorAll('.btn-edit');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const id     = this.getAttribute('data-id');
+                const image  = this.getAttribute('data-image');
+                const sponsor_name  = this.getAttribute('data-sponsor-name');
+                const event  = this.getAttribute('data-event');
+                const link   = this.getAttribute('data-link');
+                const order  = this.getAttribute('data-order');
+
+                document.getElementById('edit-sponsor-id').value = id;
+                document.getElementById('edit-old-image').value = image;
+                document.getElementById('edit-sponsor-name').value = sponsor_name;
+                if (document.getElementById('edit-event')) document.getElementById('edit-event').value = event;
+                document.getElementById('edit-link').value = link;
+                document.getElementById('edit-order').value = order;
+                document.getElementById('edit-preview').src = 'images/' + image;
+            });
+        });
+
+        // Event select handler
+        var eventSelect = document.getElementById('event-select');
+        var statusSelect = document.getElementById('event-status');
+        var statusBadge = document.getElementById('status-badge');
+        var settingsSection = document.getElementById('event-settings-section');
+
+        if (eventSelect) {
+            // Auto-load first event on page init
+            var firstVal = eventSelect.value;
+            filterTable(firstVal);
+
+            if (document.getElementById('editor_sponsor')) {
+                createCustomEditor('editor_sponsor');
+                editorInitialized = true;
+                CKEDITOR.instances['editor_sponsor'].on('instanceReady', function() {
+                    loadEventData(firstVal);
+                });
+            }
+
+            // Switch event handler
+            eventSelect.addEventListener('change', function() {
+                var val = this.value;
+                filterTable(val);
+                loadEventData(val);
+            });
+
+            // Status change → sync hidden field + update badge
+            if (statusSelect) {
+                statusSelect.addEventListener('change', function() {
+                    document.getElementById('form-event-status').value = this.value;
+                    var badge = document.getElementById('status-badge');
+                    if (this.value == 1) {
+                        badge.innerHTML = '<span class="badge bg-primary">Publish</span>';
+                    } else {
+                        badge.innerHTML = '<span class="badge bg-danger">Unpublish</span>';
+                    }
+                });
+            }
+        }
     });
-});
+
+    // Upload gambar untuk CKEditor
+    document.getElementById('hidden-image-upload').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        var targetEditorId = this.getAttribute('data-target');
+        var formData = new FormData();
+        formData.append('upload', file);
+        document.body.style.cursor = 'wait';
+        fetch('ckeditor_upload.php', { method: 'POST', body: formData })
+        .then(response => response.json())
+        .then(data => {
+            if (data.uploaded === 1) {
+                var imgHtml = '<img src="' + data.url + '" style="max-width: 100%; height: auto;" width="500" alt="image" />';
+                CKEDITOR.instances[targetEditorId].insertHtml(imgHtml);
+            } else {
+                alert("Upload Gagal: " + (data.error ? data.error.message : 'Error'));
+            }
+        })
+        .catch(error => { alert("Koneksi Error."); })
+        .finally(() => { e.target.value = ''; document.body.style.cursor = 'default'; });
+    });
 </script>
 
 </body>

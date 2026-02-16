@@ -2,7 +2,7 @@
 ob_start();
 session_start();
 
-if (!isset($_SESSION['useremail'])) {
+if (!isset($_SESSION['admin_id'])) {
     header("Location: login.php");
     exit;
 }
@@ -109,16 +109,20 @@ if (isset($_POST['Update'])) {
                                         <td><span class="badge bg-info text-dark"><?= htmlspecialchars($row['event_name'] ?? 'Unlinked') ?></span></td>
                                         <td><small><?= htmlspecialchars($row['supported_link']) ?></small></td>
                                         <td>
-                                            <button class="btn btn-warning btn-sm btn-edit"
+                                            <a href="#" class="text-primary me-2 btn-edit" style="text-decoration:none;"
                                                 data-bs-toggle="modal" data-bs-target="#editModal"
                                                 data-id="<?= $row['supported_id'] ?>"
                                                 data-name="<?= htmlspecialchars($row['supported_name']) ?>"
                                                 data-event="<?= $row['event_id'] ?>"
                                                 data-link="<?= htmlspecialchars($row['supported_link']) ?>"
-                                                data-image="<?= $row['supported_image'] ?>">Edit</button>
-
-                                            <a href="hapussupported.php?id=<?= $row['supported_id'] ?>&image=<?= $row['supported_image'] ?>"
-                                                class="btn btn-danger btn-sm" onclick="return confirm('Hapus sponsor ini?')">Delete</a>
+                                                data-image="<?= $row['supported_image'] ?>">
+                                               Edit
+                                            </a>
+                                            <a href="hapussupported.php?id=<?= $row['supported_id'] ?>&image=<?= $row['supported_image'] ?>" 
+                                               class="text-primary" style="text-decoration:none;"
+                                               onclick="return confirm('Apakah Anda yakin ingin menghapus file ini?')">
+                                               Delete
+                                            </a>
                                         </td>
                                     </tr>
                                     <?php } ?>
@@ -132,6 +136,7 @@ if (isset($_POST['Update'])) {
         <?php include "bagiankode/footer.php"; ?>
     </div>
 </div>
+
 
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog">

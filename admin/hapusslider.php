@@ -3,7 +3,7 @@ ob_start();
 session_start();
 
 // Cek Login untuk keamanan agar tidak sembarang orang bisa akses URL ini
-if (!isset($_SESSION['useremail'])) {
+if (!isset($_SESSION['admin_id'])) {
     header("Location: login.php");
     exit;
 }

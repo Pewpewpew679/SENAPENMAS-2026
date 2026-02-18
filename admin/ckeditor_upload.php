@@ -8,7 +8,7 @@ session_start();
 
 // 2. Cek Login (Security)
 // Ganti 'useremail' dengan nama session login Anda yang sebenarnya jika berbeda
-if (!isset($_SESSION['useremail'])) {
+if (!isset($_SESSION['admin_id'])) {
     echo json_encode(['uploaded' => 0, 'error' => ['message' => 'Unauthorized: Silahkan login terlebih dahulu.']]);
     exit;
 }

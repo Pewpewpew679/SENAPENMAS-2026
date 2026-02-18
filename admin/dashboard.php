@@ -25,6 +25,7 @@ $conn->close();
 <html lang="en">
 <?php include "bagiankode/head.php"; ?>
 
+<<<<<<< HEAD
 <body class="sb-nav-fixed">
 <?php include "bagiankode/menunav.php"; ?>
 
@@ -63,6 +64,26 @@ $conn->close();
                                 </div>
                             </div>
                         </div>
+=======
+<?php ob_start();
+session_start();
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: login.php");
+}
+?>
+    <body class="sb-nav-fixed">
+        <?php include "bagiankode/menunav.php"; ?>
+        <div id="layoutSidenav">   
+        <?php include "bagiankode/menu.php"; ?>
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid px-4">
+                        <h1 class="mt-4">Dashboard</h1>
+                        <ol class="breadcrumb mb-4">
+                            <li class="breadcrumb-item active">Dashboard</li>
+                        </ol>
+                        
+>>>>>>> 6b0f35829456f5837a9a7a79a69da2bb2300ddb7
                     </div>
 
                     <!-- Total Events Card -->

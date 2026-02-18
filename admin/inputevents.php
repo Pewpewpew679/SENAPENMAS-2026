@@ -23,9 +23,6 @@ if (!isset($_SESSION['useremail'])) {
         $link_reg   = mysqli_real_escape_string($conn, $_POST['link_registration']);
         $linkpage   = mysqli_real_escape_string($conn, $_POST['linkpage_event']);
         
-        $is_menu    = $_POST['is_menu']; 
-        $menu_parent= (int) $_POST['menu_parent']; 
-        $menu_order = (int) $_POST['menu_order'];
         $pub_date   = $_POST['publish_date'];
         $status     = $_POST['status']; 
 
@@ -44,9 +41,9 @@ if (!isset($_SESSION['useremail'])) {
 
         if (move_uploaded_file($tmp, $folder . $new_poster)) {
             $query = "INSERT INTO events 
-                      (event_category, event_name, event_topic, event_year, description, start_date, end_date, poster, link_registration, linkpage_event, is_menu, menu_parent, menu_order, publish_date, status) 
+                      (event_category, event_name, event_topic, event_year, description, start_date, end_date, poster, link_registration, linkpage_event, publish_date, status) 
                       VALUES 
-                      ('$category', '$name', '$topic', '$year', '$desc', '$start', '$end', '$new_poster', '$link_reg', '$linkpage', '$is_menu', '$menu_parent', '$menu_order', '$pub_date', '$status')";
+                      ('$category', '$name', '$topic', '$year', '$desc', '$start', '$end', '$new_poster', '$link_reg', '$linkpage', '$pub_date', '$status')";
             
             if (mysqli_query($conn, $query)) {
                 header("Location: inputevents.php?msg=success");
@@ -74,9 +71,6 @@ if (!isset($_SESSION['useremail'])) {
         $link_reg   = mysqli_real_escape_string($conn, $_POST['link_registration']);
         $linkpage   = mysqli_real_escape_string($conn, $_POST['linkpage_event']);
         
-        $is_menu    = $_POST['is_menu'];
-        $menu_parent= (int) $_POST['menu_parent'];
-        $menu_order = (int) $_POST['menu_order'];
         $pub_date   = $_POST['publish_date'];
         $status     = $_POST['status'];
 
@@ -103,7 +97,7 @@ if (!isset($_SESSION['useremail'])) {
                   event_category='$category', event_name='$name', event_topic='$topic', 
                   event_year='$year', description='$desc', start_date='$start', end_date='$end', 
                   poster='$final_poster', link_registration='$link_reg', linkpage_event='$linkpage',
-                  is_menu='$is_menu', menu_parent='$menu_parent', menu_order='$menu_order', publish_date='$pub_date', status='$status'
+                  publish_date='$pub_date', status='$status'
                   WHERE event_id='$event_id'";
 
         if(mysqli_query($conn, $query)){
@@ -186,9 +180,6 @@ if (!isset($_SESSION['useremail'])) {
                                                    data-end="<?= $row['end_date'] ?>"
                                                    data-link="<?= htmlspecialchars($row['link_registration']) ?>"
                                                    data-linkpage="<?= htmlspecialchars($row['linkpage_event']) ?>"
-                                                   data-ismenu="<?= $row['is_menu'] ?>"
-                                                   data-menuparent="<?= $row['menu_parent'] ?>"
-                                                   data-menuorder="<?= $row['menu_order'] ?>"
                                                    data-pubdate="<?= $row['publish_date'] ?>"
                                                    data-status="<?= $row['status'] ?>">
                                                    Edit
@@ -244,19 +235,6 @@ if (!isset($_SESSION['useremail'])) {
                         <div class="mb-3"><label class="form-label">Link Registration</label><input type="text" name="link_registration" class="form-control" placeholder="https://..."></div>
                         <div class="mb-3"><label class="form-label">Link Page Event</label><input type="text" name="linkpage_event" class="form-control" placeholder="event/1/NAMA-EVENT"></div>
                         
-                        <div class="mb-3">
-                            <label class="form-label">Make This Event As a Menu?</label>
-                            <select name="is_menu" class="form-select">
-                                <option value="No">No</option><option value="Yes">Yes</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Main Menu/Submenu</label>
-                            <select name="menu_parent" class="form-select">
-                                <option value="0">As Main Menu</option>
-                            </select>
-                        </div>
-                        <div class="mb-3"><label class="form-label">Menu Order</label><input type="number" name="menu_order" class="form-control" placeholder="Urutan"></div>
                         <div class="mb-3"><label class="form-label">Publish Date*</label><input type="date" name="publish_date" class="form-control" required></div>
                         <div class="mb-3">
                             <label class="form-label">Status*</label>
@@ -304,9 +282,6 @@ if (!isset($_SESSION['useremail'])) {
                         <div class="mb-3"><label class="form-label">Link Registration</label><input type="text" name="link_registration" id="edit-link" class="form-control"></div>
                         <div class="mb-3"><label class="form-label">Link Page Event</label><input type="text" name="linkpage_event" id="edit-linkpage" class="form-control"></div>
                         
-                        <div class="mb-3"><label class="form-label">Make This Event As a Menu?</label><select name="is_menu" id="edit-ismenu" class="form-select"><option value="No">No</option><option value="Yes">Yes</option></select></div>
-                        <div class="mb-3"><label class="form-label">Main Menu/Submenu</label><select name="menu_parent" id="edit-menuparent" class="form-select"><option value="0">As Main Menu</option></select></div>
-                        <div class="mb-3"><label class="form-label">Menu Order</label><input type="number" name="menu_order" id="edit-menuorder" class="form-control"></div>
                         <div class="mb-3"><label class="form-label">Publish Date</label><input type="date" name="publish_date" id="edit-pubdate" class="form-control" required></div>
                         <div class="mb-3"><label class="form-label">Status</label><select name="status" id="edit-status" class="form-select"><option value="1">Active</option><option value="0">Inactive</option></select></div>
                     </div>
@@ -334,9 +309,10 @@ if (!isset($_SESSION['useremail'])) {
         CKEDITOR.addCss('.cke_widget_wrapper { max-width: 100% !important; }');
 
         // CSS ALIGNMENT (Sama persis dengan yang ada di main.php, tapi tanpa .event-description)
-        CKEDITOR.addCss('.image-left { float: left; margin: 0 20px 10px 0; clear: left; }');
-        CKEDITOR.addCss('.image-right { float: right; margin: 0 0 10px 20px; clear: right; }');
-        CKEDITOR.addCss('.image-center { display: block; margin-left: auto; margin-right: auto; text-align: center; clear: both; }');
+        // Ditambahkan !important agar mengalahkan style bawaan widget CKEditor (image2)
+        CKEDITOR.addCss('.image-left { display: block !important; margin-left: 0 !important; margin-right: auto !important; margin-bottom: 10px !important; text-align: left !important; clear: both !important; }');
+        CKEDITOR.addCss('.image-right { display: block !important; margin-left: auto !important; margin-right: 0 !important; margin-bottom: 10px !important; text-align: right !important; clear: both !important; }');
+        CKEDITOR.addCss('.image-center { display: block !important; margin-left: auto !important; margin-right: auto !important; margin-bottom: 10px !important; text-align: center !important; clear: both !important; }');
         
         // --- TAMBAHAN PENTING ---
         // Memaksa Editor meniru jarak spasi Bootstrap (Main.php)
@@ -432,9 +408,6 @@ if (!isset($_SESSION['useremail'])) {
                     document.getElementById('edit-linkpage').value = this.getAttribute('data-linkpage');
                     document.getElementById('edit-preview').src = 'images/events/' + this.getAttribute('data-poster');
                     
-                    document.getElementById('edit-ismenu').value = this.getAttribute('data-ismenu');
-                    document.getElementById('edit-menuparent').value = this.getAttribute('data-menuparent');
-                    document.getElementById('edit-menuorder').value = this.getAttribute('data-menuorder');
                     document.getElementById('edit-pubdate').value = this.getAttribute('data-pubdate');
                     document.getElementById('edit-status').value = this.getAttribute('data-status');
 

@@ -9,7 +9,7 @@ if (!isset($_SESSION['useremail'])) {
 }
 
 // Cek apakah user sudah login (Security)
-if (!isset($_SESSION['useremail'])) {
+if (!isset($_SESSION['admin_id'])) {
     header("Location: login.php");
     exit;
 }

@@ -11,25 +11,12 @@ if (!isset($_SESSION['useremail'])) {
 
 include "includes/config.php";
 
-// Periksa apakah kolom menu_order ada, jika tidak coba buat
-$has_menu_order = false;
-$colRes = mysqli_query($conn, "SHOW COLUMNS FROM menu LIKE 'menu_order'");
-if ($colRes && mysqli_num_rows($colRes) > 0) {
-    $has_menu_order = true;
-} else {
-    // Coba tambahkan kolom (jika user punya hak)
-    @mysqli_query($conn, "ALTER TABLE menu ADD COLUMN menu_order INT NULL DEFAULT NULL");
-    $colRes2 = mysqli_query($conn, "SHOW COLUMNS FROM menu LIKE 'menu_order'");
-    if ($colRes2 && mysqli_num_rows($colRes2) > 0) {
-        $has_menu_order = true;
-    } else {
-        // tidak berhasil membuat kolom - biarkan flag false
-        // (informasi kalau mau dibantu tambah manual bisa ditampilkan ke user)
-    }
-}
+// Kolom menu_order dan status sudah ada di tabel menu
+$has_menu_order = true;
+$has_status = true;
 
 $parent_list = [];
-$parent_res = mysqli_query($conn, "SELECT menu_id, menu_name FROM menu ORDER BY menu_name");
+$parent_res = mysqli_query($conn, "SELECT menu_id, menu_name FROM menu WHERE parent_id IS NULL ORDER BY menu_name");
 while ($r = mysqli_fetch_assoc($parent_res)) { $parent_list[] = $r; }
 
 // Siapkan clause order kalau kolom menu_order ada
@@ -46,13 +33,15 @@ if (isset($_POST['Simpan'])) {
 
     $parent_sql = ($parent === '' || $parent === '0') ? "NULL" : "'" . $parent . "'";
 
-    // handle order jika kolom tersedia
-    if ($has_menu_order) {
-        $order_val = isset($_POST['menu_order']) && $_POST['menu_order'] !== '' ? intval($_POST['menu_order']) : 'NULL';
-        $sql = "INSERT INTO menu (menu_name, parent_id, menu_type, menu_link, menu_order) VALUES ('$menu', $parent_sql, '$type', '$link', $order_val)";
-    } else {
-        $sql = "INSERT INTO menu (menu_name, parent_id, menu_type, menu_link) VALUES ('$menu', $parent_sql, '$type', '$link')";
-    }
+    // handle order dan status
+    $order_val = ($has_menu_order && isset($_POST['menu_order']) && $_POST['menu_order'] !== '') ? intval($_POST['menu_order']) : 'NULL';
+    $status_val = ($has_status && isset($_POST['status'])) ? intval($_POST['status']) : 1;
+
+    $cols = "menu_name, parent_id, menu_type, menu_link";
+    $vals = "'$menu', $parent_sql, '$type', '$link'";
+    if ($has_menu_order) { $cols .= ", menu_order"; $vals .= ", $order_val"; }
+    if ($has_status) { $cols .= ", status"; $vals .= ", $status_val"; }
+    $sql = "INSERT INTO menu ($cols) VALUES ($vals)";
 
     if (!mysqli_query($conn, $sql)) {
         $_SESSION['error'] = 'Terjadi kesalahan database: ' . mysqli_error($conn);
@@ -77,19 +66,23 @@ if (isset($_POST['Update'])) {
 
     // Cegah memilih parent yang sama dengan menu itu sendiri
     if ($parent !== '' && $parent === $menu_id) {
-        $_SESSION['error'] = 'Parent tidak boleh sama dengan menu yang sedang dibuay.';
+        $_SESSION['error'] = 'Parent tidak boleh sama dengan menu yang sedang diupdate.';
         header('Location: inputmenu.php');
         exit;
     }
 
     $parent_sql = ($parent === '' || $parent === '0') ? "NULL" : "'" . $parent . "'";
 
+    $sql = "UPDATE menu SET menu_name='$menu', parent_id=$parent_sql, menu_type='$type', menu_link='$link'";
     if ($has_menu_order) {
         $order_val = isset($_POST['menu_order']) && $_POST['menu_order'] !== '' ? intval($_POST['menu_order']) : 'NULL';
-        $sql = "UPDATE menu SET menu_name='$menu', parent_id=$parent_sql, menu_type='$type', menu_link='$link', menu_order=$order_val WHERE menu_id='$menu_id'";
-    } else {
-        $sql = "UPDATE menu SET menu_name='$menu', parent_id=$parent_sql, menu_type='$type', menu_link='$link' WHERE menu_id='$menu_id'";
+        $sql .= ", menu_order=$order_val";
     }
+    if ($has_status) {
+        $status_val = isset($_POST['status']) ? intval($_POST['status']) : 1;
+        $sql .= ", status=$status_val";
+    }
+    $sql .= " WHERE menu_id='$menu_id'";
 
     if (!mysqli_query($conn, $sql)) {
         $_SESSION['error'] = 'Terjadi kesalahan database saat mengupdate: ' . mysqli_error($conn);
@@ -141,6 +134,7 @@ if (isset($_POST['Update'])) {
                                         <th>Type</th>
                                         <th width="60">Link</th>
                                         <th width="60">Order</th>
+                                        <th width="80">Status</th>
                                         <th width="120">Action</th> 
                                     </tr>
                                 </thead>
@@ -159,6 +153,12 @@ if (isset($_POST['Update'])) {
                                         <td><?= htmlspecialchars($row['menu_link']) ?></td>
                                         <td><?= isset($row['menu_order']) && $row['menu_order'] !== null ? htmlspecialchars($row['menu_order']) : '-' ?></td>
                                         <td>
+                                            <?php $menu_status = isset($row['status']) ? (int)$row['status'] : 1; ?>
+                                            <span class="<?= $menu_status == 1 ? 'text-primary' : 'text-danger' ?>">
+                                                <?= $menu_status == 1 ? 'Publish' : 'Unpublish' ?>
+                                            </span>
+                                        </td>
+                                        <td>
                                             <a href="javascript:void(0)" 
                                                     class="btn-edit me-2" href="#" 
                                                     style="text-decoration: none; margin-right: 30px;"
@@ -169,7 +169,8 @@ if (isset($_POST['Update'])) {
                                                     data-parent="<?= htmlspecialchars($row['parent_id']) ?>"
                                                     data-type="<?= htmlspecialchars($row['menu_type']) ?>"
                                                     data-link="<?= htmlspecialchars($row['menu_link']) ?>"
-                                                    data-order="<?= htmlspecialchars($row['menu_order'] ?? '') ?>">
+                                                    data-order="<?= htmlspecialchars($row['menu_order'] ?? '') ?>"
+                                                    data-status="<?= isset($row['status']) ? $row['status'] : 1 ?>">
                                                 Edit
                                             </a>
                                             <a href="hapusmenu.php?id=<?= $row['menu_id'] ?>" style="text-decoration: none;"
@@ -203,11 +204,11 @@ if (isset($_POST['Update'])) {
                         <input type="text" name="menu" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Parent</label>
+                        <label class="form-label">Main Menu/Submenu</label>
                         <select name="parent" class="form-select">
-                            <option value="">Main Menu</option>
+                            <option value="">As Main Menu</option>
                             <?php foreach ($parent_list as $p): ?>
-                                <option value="<?= $p['menu_id'] ?>"><?= htmlspecialchars($p['menu_name']) ?></option>
+                                <option value="<?= $p['menu_id'] ?>">Submenu > <?= htmlspecialchars($p['menu_name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div> 
@@ -226,6 +227,13 @@ if (isset($_POST['Update'])) {
                         <label class="form-label">Order</label>
                         <input type="number" name="menu_order" class="form-control" min="0" placeholder="Urutan (angka)" />
                     </div> 
+                    <div class="mb-3">
+                        <label class="form-label">Status *</label>
+                        <select name="status" class="form-select">
+                            <option value="1">Publish</option>
+                            <option value="0">Unpublish</option>
+                        </select>
+                    </div>
                     
                 </div>
                 <div class="modal-footer">
@@ -253,11 +261,11 @@ if (isset($_POST['Update'])) {
                         <input type="text" name="menu" id="edit-menu" class="form-control" required>
                     </div> 
                     <div class="mb-3">
-                        <label class="form-label">Parent *</label>
+                        <label class="form-label">Main Menu/Submenu</label>
                         <select name="parent" id="edit-parent" class="form-select">
                             <option value="">As Main Menu</option>
                             <?php foreach ($parent_list as $p): ?>
-                                <option value="<?= $p['menu_id'] ?>"><?= htmlspecialchars($p['menu_name']) ?></option>
+                                <option value="<?= $p['menu_id'] ?>">Submenu > <?= htmlspecialchars($p['menu_name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -275,6 +283,13 @@ if (isset($_POST['Update'])) {
                     <div class="mb-3">
                         <label class="form-label">Order</label>
                         <input type="number" name="menu_order" id="edit-order" class="form-control" min="0" placeholder="Urutan (angka)" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status *</label>
+                        <select name="status" id="edit-status" class="form-select">
+                            <option value="1">Publish</option>
+                            <option value="0">Unpublish</option>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -312,6 +327,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('edit-type').value = type;
             document.getElementById('edit-link').value = link;
             if (document.getElementById('edit-order')) document.getElementById('edit-order').value = order;
+            if (document.getElementById('edit-status')) document.getElementById('edit-status').value = this.getAttribute('data-status');
         });
     });
 });

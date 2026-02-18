@@ -1,44 +1,76 @@
-* {
-  margin: 0px;
-  padding: 0px;
-  list-style: none; 
+body {
+    font-family: Arial;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-    .kolomkiri {
-      background-color: #1B1464;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 2px;
-    }
-    .kolomkiri h2 p {
-      font-weight: 650;
-      margin-bottom: 2px;
-    }
-    .container {
-      display: flex;
-      margin-top: 25px;
-      height: 90vh;
-      width: 75%;
-    }
-    .kolomkanan {
-      flex: 2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #7f8fa6;
-    }
-    .login-box {
-      width: 350px;
-    }
-    .btn-login {
-      background-color: #1B1464;
-      color: white;
-      width: 100%;
-    }
-    .btn-login:hover {
-      background-color: #006266;
-      color: white;
-    } 
+.box {
+    background: white;
+    padding: 40px;
+    width: 380px; /* sedikit diperlebar biar lebih proporsional */
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 18px;
+    box-sizing: border-box; /* ini yang bikin sejajar */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #667eea;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #5563c1;
+}
+
+.error {
+    color: red;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+img {
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+/* 🔥 Bagian yang kamu minta diperbaiki */
+.back-link {
+    text-align: center;
+    margin-top: 30px; /* diturunin biar nggak mepet */
+    font-size: 14px;
+    color: #555;
+}
+
+.back-link a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.back-link a:hover {
+    text-decoration: underline;
+}

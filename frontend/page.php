@@ -85,17 +85,7 @@ $base_url = "/senapenmas-2026/frontend/";
         }
 
         /* --- STYLE KONTEN --- */
-        .page-cover {
-            width: 100%;
-            height: auto;
-            max-height: 500px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
+
         /* UPDATED: Page Meta (Tanggal) di Kanan */
         .page-meta {
             color: #666;
@@ -127,6 +117,12 @@ $base_url = "/senapenmas-2026/frontend/";
         .page-content p { margin-bottom: 20px; }
         .page-content ul, .page-content ol { margin-bottom: 20px; padding-left: 30px; }
         .page-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+
+        /* --- CLASS ALIGNMENT (SINKRONISASI DENGAN ADMIN inputpage.php) --- */
+        .page-content .image-left { display: block; margin-right: auto; margin-bottom: 10px; text-align: left; clear: both; }
+        .page-content .image-right { display: block; margin-left: auto; margin-bottom: 10px; text-align: right; clear: both; }
+        .page-content .image-center { display: block; margin-left: auto; margin-right: auto; margin-bottom: 10px; text-align: center; clear: both; }
+
         .page-content table { width: 100%; margin: 20px 0; }
 
         .page-content > h1:first-child,
@@ -158,12 +154,6 @@ $base_url = "/senapenmas-2026/frontend/";
     <div class="container mb-5">
         <div class="row">
             <div class="col-lg-10 offset-lg-1">
-                
-                <?php if (!empty($page['page_cover']) && file_exists('images/pages/' . $page['page_cover'])): ?>
-                    <img src="<?php echo $base_url; ?>images/pages/<?php echo $page['page_cover']; ?>" 
-                         alt="<?php echo htmlspecialchars($page['page_title']); ?>" 
-                         class="page-cover">
-                <?php endif; ?>
                 
                 <div class="page-content">
                     <?php echo $page['page_content']; ?>

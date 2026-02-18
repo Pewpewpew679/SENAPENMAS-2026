@@ -2,7 +2,7 @@
     ob_start();
     session_start();
 
-    if (!isset($_SESSION['useremail'])) {
+    if (!isset($_SESSION['admin_id'])) {
         header("Location: login.php");
         exit;
     }
@@ -21,7 +21,7 @@
         $event_id   = (int) $_POST['event_id'];
         $menu_order = isset($_POST['menu_order']) && $_POST['menu_order'] != '' ? (int) $_POST['menu_order'] : NULL;
         $pub_date   = $_POST['publish_date'];
-        $status     = $_POST['status'];
+        $status     = 'Publish'; // Auto publish
 
         // Cek apakah event sudah ada di past conferences
         $check = mysqli_query($conn, "SELECT * FROM past_conferences WHERE event_id = $event_id");
@@ -70,7 +70,7 @@
         $event_id     = (int) $_POST['event_id'];
         $menu_order   = isset($_POST['menu_order']) && $_POST['menu_order'] != '' ? (int) $_POST['menu_order'] : NULL;
         $pub_date     = $_POST['publish_date'];
-        $status       = $_POST['status'];
+        $status       = 'Publish'; // Auto publish
 
         $order_sql = $menu_order ? $menu_order : "NULL";
 
@@ -164,7 +164,6 @@
                                             <th width="60">Year</th>
                                             <th width="180">Date</th>
                                             <th width="100">Menu Order</th>
-                                            <th width="100">Status</th>
                                             <th width="150">Link</th>
                                             <th width="120">Action</th>
                                         </tr>
@@ -191,11 +190,6 @@
                                             <td><?= $row['event_year'] ?></td>
                                             <td><small>Start: <?= $startDate ?><br>End: <?= $endDate ?></small></td>
                                             <td><?= $row['menu_order'] ?? '-' ?></td>
-                                            <td>
-                                                <span class="<?= $row['status'] == 'Publish' ? 'text-success' : 'text-secondary' ?>">
-                                                    <?= $row['status'] ?>
-                                                </span>
-                                            </td>
                                             <td><a href="<?= $event_link ?>" target="_blank"><?= $event_link ?></a></td>
                                             <td>
                                                 <a href="#" class="text-primary me-2 btn-edit" style="text-decoration:none;"
@@ -203,8 +197,7 @@
                                                    data-id="<?= $row['past_conf_id'] ?>"
                                                    data-eventid="<?= $row['event_id'] ?>"
                                                    data-menuorder="<?= $row['menu_order'] ?>"
-                                                   data-pubdate="<?= $row['publish_date'] ?>"
-                                                   data-status="<?= $row['status'] ?>">
+                                                   data-pubdate="<?= $row['publish_date'] ?>">
                                                    Edit
                                                 </a>
 
@@ -236,15 +229,15 @@
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Select Event*</label>
+                            <label class="form-label">Event *</label>
                             <select name="event_id" class="form-select" required>
-                                <option value="">-- Select Event --</option>
+                                <option value="">-- Pilih Event --</option>
                                 <?php
                                 // Ambil events yang belum ada di past_conferences
                                 $events_query = mysqli_query($conn, "
                                     SELECT e.event_id, e.event_name, e.event_year 
                                     FROM events e
-                                    WHERE e.event_id NOT IN (SELECT event_id FROM past_conferences)
+                                    WHERE e.status = 0 AND e.event_id NOT IN (SELECT event_id FROM past_conferences)
                                     ORDER BY e.event_year DESC, e.event_name
                                 ");
                                 while ($event = mysqli_fetch_assoc($events_query)) {
@@ -265,14 +258,7 @@
                             <input type="date" name="publish_date" class="form-control" value="<?= date('Y-m-d') ?>" required>
                         </div>
                         
-                        <div class="mb-3">
-                            <label class="form-label">Status*</label>
-                            <select name="status" class="form-select">
-                                <option value="Draft">Draft</option>
-                                <option value="Publish" selected>Publish</option>
-                                <option value="Un Publish">Un Publish</option>
-                            </select>
-                        </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -312,14 +298,7 @@
                             <input type="date" name="publish_date" id="edit-pubdate" class="form-control" required>
                         </div>
                         
-                        <div class="mb-3">
-                            <label class="form-label">Status*</label>
-                            <select name="status" id="edit-status" class="form-select">
-                                <option value="Draft">Draft</option>
-                                <option value="Publish">Publish</option>
-                                <option value="Un Publish">Un Publish</option>
-                            </select>
-                        </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -345,7 +324,6 @@
                     document.getElementById('edit-event-id').value = this.getAttribute('data-eventid');
                     document.getElementById('edit-menuorder').value = this.getAttribute('data-menuorder');
                     document.getElementById('edit-pubdate').value = this.getAttribute('data-pubdate');
-                    document.getElementById('edit-status').value = this.getAttribute('data-status');
                     
                     // Get event name for display
                     const eventId = this.getAttribute('data-eventid');
